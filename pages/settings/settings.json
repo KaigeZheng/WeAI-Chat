@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "设置",
+  "navigationStyle": "custom",
+  "usingComponents": {},
+  "disableScroll": false,
+  "enablePullDownRefresh": false,
+  "onReachBottomDistance": 50
+} 

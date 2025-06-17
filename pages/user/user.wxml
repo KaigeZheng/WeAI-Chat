@@ -1,0 +1,38 @@
+<view class="container">
+  <view class="header">
+    <text class="title">个人设置</text>
+  </view>
+
+  <view class="user-section">
+    <view class="avatar-section">
+      <view class="avatar-container" bindtap="chooseAvatar">
+        <image wx:if="{{userInfo.avatarUrl}}" class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+        <view wx:else class="avatar-placeholder">
+          <text class="avatar-text">👤</text>
+        </view>
+        <view class="avatar-edit">
+          <text class="edit-text">点击更换</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="info-section">
+      <view class="info-item">
+        <text class="label">昵称</text>
+        <input class="input" value="{{userInfo.nickName}}" placeholder="请输入昵称" bindinput="onNickNameInput" />
+      </view>
+      
+      <view class="info-item">
+        <text class="label">性别</text>
+        <picker class="picker" range="{{genderOptions}}" value="{{userInfo.gender}}" bindchange="onGenderChange">
+          <view class="picker-text">{{genderOptions[userInfo.gender]}}</view>
+        </picker>
+      </view>
+    </view>
+  </view>
+
+  <view class="action-section">
+    <button class="save-btn" bindtap="saveUserInfo">保存设置</button>
+    <button class="reset-btn" bindtap="resetUserInfo">重置</button>
+  </view>
+</view> 

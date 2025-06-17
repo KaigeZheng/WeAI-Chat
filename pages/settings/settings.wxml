@@ -1,0 +1,229 @@
+<view class="settings-container">
+  <!-- 安全区域适配 -->
+  <view class="safe-area-top"></view>
+  
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="header-left">
+        <view class="back-btn" bindtap="goBack">
+          <text class="back-icon">←</text>
+        </view>
+      </view>
+      <view class="header-center">
+        <text class="title">设置</text>
+      </view>
+      <view class="header-right">
+        <!-- 预留空间保持对称 -->
+      </view>
+    </view>
+  </view>
+
+  <!-- 设置内容 - 添加滚动支持 -->
+  <scroll-view 
+    class="settings-scroll" 
+    scroll-y="true" 
+    enhanced="true" 
+    show-scrollbar="false"
+    scroll-anchoring="true"
+    refresher-enabled="false"
+  >
+    <view class="settings-content">
+      <!-- API配置区域 -->
+      <view class="settings-section">
+        <view class="section-title">API配置</view>
+        
+        <!-- 阿里百炼 Qwen-Plus配置 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">阿里百炼 API Key</text>
+            <text class="label-desc">用于调用Qwen-Plus模型</text>
+          </view>
+          <view class="setting-input">
+            <view class="input-wrapper">
+              <input 
+                class="api-input" 
+                placeholder="请输入阿里百炼API Key" 
+                value="{{dashScopeKey}}"
+                password="{{!showDashScopeKey}}"
+                bindinput="onDashScopeKeyChange"
+              />
+              <view class="eye-btn" bindtap="toggleDashScopeKeyVisibility">
+                <text class="eye-icon">{{showDashScopeKey ? '👁' : '👁‍🗨'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- DeepSeek配置 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">DeepSeek API Key</text>
+            <text class="label-desc">用于调用DeepSeek的AI模型</text>
+          </view>
+          <view class="setting-input">
+            <view class="input-wrapper">
+              <input 
+                class="api-input" 
+                placeholder="请输入DeepSeek API Key" 
+                value="{{deepseekKey}}"
+                password="{{!showDeepSeekKey}}"
+                bindinput="onDeepSeekKeyChange"
+              />
+              <view class="eye-btn" bindtap="toggleDeepSeekKeyVisibility">
+                <text class="eye-icon">{{showDeepSeekKey ? '👁' : '👁‍🗨'}}</text>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <!-- 默认服务选择 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">默认AI服务</text>
+            <text class="label-desc">选择优先使用的AI服务</text>
+          </view>
+          <view class="setting-select">
+            <picker 
+              mode="selector" 
+              range="{{serviceOptions}}" 
+              value="{{defaultServiceIndex}}"
+              bindchange="onServiceChange"
+            >
+              <view class="picker-text">{{serviceOptions[defaultServiceIndex]}}</view>
+            </picker>
+          </view>
+        </view>
+      </view>
+
+      <!-- 聊天设置区域 -->
+      <view class="settings-section">
+        <view class="section-title">聊天设置</view>
+        
+        <!-- 消息历史 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">保存聊天记录</text>
+            <text class="label-desc">自动保存聊天历史到本地</text>
+          </view>
+          <view class="setting-switch">
+            <switch 
+              checked="{{saveHistory}}" 
+              bindchange="onSaveHistoryChange"
+              color="#667eea"
+            />
+          </view>
+        </view>
+
+        <!-- 清空聊天记录 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">清空聊天记录</text>
+            <text class="label-desc">删除所有本地聊天历史</text>
+          </view>
+          <view class="setting-button">
+            <button class="clear-btn" bindtap="clearAllHistory">清空</button>
+          </view>
+        </view>
+      </view>
+
+      <!-- 高级设置区域 -->
+      <view class="settings-section">
+        <view class="section-title">高级设置</view>
+        
+        <!-- Temperature设置 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">Temperature (创造性)</text>
+            <text class="label-desc">控制AI回复的随机性和创造性 ({{temperature}})</text>
+          </view>
+          <view class="setting-slider" catchtouchmove="true">
+            <slider 
+              min="0" 
+              max="2" 
+              step="0.1" 
+              value="{{temperature}}" 
+              bindchange="onTemperatureChange"
+              activeColor="#667eea"
+              backgroundColor="#e9ecef"
+              block-size="24"
+              block-color="#667eea"
+            />
+          </view>
+        </view>
+
+        <!-- Max Tokens设置 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">Max Tokens (最大长度)</text>
+            <text class="label-desc">控制AI回复的最大长度 ({{maxTokens}})</text>
+          </view>
+          <view class="setting-slider" catchtouchmove="true">
+            <slider 
+              min="50" 
+              max="4000" 
+              step="50" 
+              value="{{maxTokens}}" 
+              bindchange="onMaxTokensChange"
+              activeColor="#667eea"
+              backgroundColor="#e9ecef"
+              block-size="24"
+              block-color="#667eea"
+            />
+          </view>
+        </view>
+
+        <!-- 重置高级设置 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">重置高级设置</text>
+            <text class="label-desc">恢复默认的AI参数设置</text>
+          </view>
+          <view class="setting-button">
+            <button class="reset-btn" bindtap="resetAdvancedSettings">重置</button>
+          </view>
+        </view>
+      </view>
+
+      <!-- 应用信息区域 -->
+      <view class="settings-section">
+        <view class="section-title">应用信息</view>
+        
+        <!-- 版本号 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">当前版本</text>
+            <text class="label-desc">WeAI Chat 应用版本</text>
+          </view>
+          <view class="setting-value">
+            <text class="version-text">{{appVersion}}</text>
+          </view>
+        </view>
+
+        <!-- 开源协议 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">开源协议</text>
+            <text class="label-desc">MIT License 开源协议</text>
+          </view>
+          <view class="setting-button">
+            <button class="license-btn" bindtap="showLicense">查看协议</button>
+          </view>
+        </view>
+      </view>
+
+      <!-- 保存按钮 -->
+      <view class="save-section">
+        <button class="save-btn" bindtap="saveSettings">保存设置</button>
+        <button class="test-btn" bindtap="testAPI">测试API连接</button>
+        <button class="network-btn" bindtap="testNetwork">测试网络连接</button>
+      </view>
+      
+      <!-- 额外的底部间距 -->
+      <view class="bottom-spacer"></view>
+    </view>
+  </scroll-view>
+  
+  <!-- 安全区域适配 -->
+  <view class="safe-area-bottom"></view>
+</view> 

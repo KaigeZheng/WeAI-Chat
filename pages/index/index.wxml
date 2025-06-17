@@ -1,0 +1,100 @@
+<!--index.wxml-->
+<view class="chat-container">
+  <!-- 安全区域适配 -->
+  <view class="safe-area-top"></view>
+  
+  <!-- 顶部导航栏 -->
+  <view class="header">
+    <view class="header-content">
+      <view class="title-section">
+        <text class="title">WeAI Chat</text>
+        <text class="service-indicator">{{currentService === 'qwen' ? 'Qwen-Plus' : 'DeepSeek'}}</text>
+      </view>
+      <view class="header-actions">
+        <view class="rect-btn settings-btn" bindtap="goToSettings">
+          <text class="btn-text">设置</text>
+        </view>
+        <view class="rect-btn clear-btn" bindtap="clearChat">
+          <text class="btn-text">清空</text>
+        </view>
+        <view class="user-avatar" bindtap="goToUserProfile">
+          <image wx:if="{{userInfo.avatarUrl}}" class="avatar-image" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+          <view wx:else class="avatar-placeholder">
+            <text class="avatar-text">👤</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 消息列表区域 -->
+  <scroll-view 
+    class="message-list" 
+    scroll-y="true" 
+    scroll-into-view="{{scrollToMessage}}"
+    scroll-with-animation="true"
+    enhanced="true"
+    show-scrollbar="false"
+  >
+    <view class="message-list-content">
+      <!-- 欢迎消息 -->
+      <view wx:if="{{messages.length === 0}}" class="welcome-message">
+        <view class="welcome-icon">🤖</view>
+        <text class="welcome-text">你好！我是WeAI Chat，有什么可以帮助你的吗？</text>
+      </view>
+      
+      <!-- 消息列表 -->
+      <view 
+        wx:for="{{messages}}" 
+        wx:key="id" 
+        class="message-item {{item.role === 'user' ? 'user-message' : 'ai-message'}}"
+        id="msg-{{item.id}}"
+      >
+        <view class="message-avatar">
+          <image wx:if="{{item.role === 'user' && userInfo.avatarUrl}}" class="avatar-image" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+          <view wx:else class="avatar-placeholder">
+            <text class="avatar-text">{{item.role === 'user' ? '👤' : (item.model === 'qwen' ? 'Q' : 'D')}}</text>
+          </view>
+        </view>
+        <view class="message-content">
+          <view class="message-bubble">
+            <!-- <wemark wx:if="{{item.role === 'assistant'}}" md="{{item.content}}" link highlight class="message-text"></wemark> -->
+            <text class="message-text" user-select="true">{{item.content}}</text>
+            <view wx:if="{{item.isStreaming}}" class="streaming-indicator">
+              <view class="streaming-dot"></view>
+              <view class="streaming-dot"></view>
+              <view class="streaming-dot"></view>
+            </view>
+          </view>
+          <view class="message-time">{{item.time}}</view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 底部输入区域 -->
+  <view class="input-container">
+    <view class="input-wrapper">
+      <textarea 
+        class="message-input" 
+        placeholder="输入你的问题..." 
+        value="{{inputMessage}}"
+        bindinput="onInputChange"
+        bindconfirm="sendMessage"
+        auto-height="true"
+        maxlength="1000"
+        show-confirm-bar="false"
+        cursor-spacing="10"
+        adjust-position="true"
+        hold-keyboard="false"
+        disable-default-padding="true"
+      ></textarea>
+      <view class="send-btn {{inputMessage.trim() ? 'active' : ''}}" bindtap="sendMessage">
+        <text class="send-icon">发送</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 安全区域适配 -->
+  <view class="safe-area-bottom"></view>
+</view>

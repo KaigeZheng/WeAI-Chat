@@ -1,0 +1,669 @@
+/**index.wxss**/
+page {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 聊天容器 */
+.chat-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+}
+
+/* 安全区域适配 */
+.safe-area-top {
+  height: calc(env(safe-area-inset-top) + 60rpx);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 80rpx;
+}
+
+.safe-area-bottom {
+  height: env(safe-area-inset-bottom);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* 顶部导航栏 */
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 20rpx 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.05);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30rpx;
+}
+
+.title-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: -0.5rpx;
+}
+
+.service-indicator {
+  font-size: 20rpx;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.1);
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.rect-btn {
+  padding: 12rpx 20rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  min-width: 80rpx;
+}
+
+.rect-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 16rpx;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.rect-btn:active::before {
+  opacity: 1;
+}
+
+.settings-btn {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.settings-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+
+.clear-btn {
+  background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+  box-shadow: 0 2rpx 8rpx rgba(255, 59, 48, 0.15);
+}
+
+.clear-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(255, 59, 48, 0.2);
+}
+
+.btn-text {
+  font-size: 24rpx;
+  font-weight: 600;
+  z-index: 1;
+  position: relative;
+}
+
+.settings-btn .btn-text {
+  color: #333;
+}
+
+.clear-btn .btn-text {
+  color: #ff3b30;
+}
+
+/* 移除旧的样式 */
+.service-badge {
+  display: none;
+}
+
+.service-text {
+  display: none;
+}
+
+.action-btn {
+  display: none;
+}
+
+.btn-icon {
+  display: none;
+}
+
+/* 消息列表区域 */
+.message-list {
+  flex: 1;
+  padding: 20rpx 0;
+  margin-bottom: 0;
+  overflow-y: auto;
+}
+
+.message-list-content {
+  padding: 0 30rpx;
+}
+
+/* 欢迎消息 */
+.welcome-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 100rpx 0;
+  text-align: center;
+}
+
+.welcome-icon {
+  font-size: 80rpx;
+  margin-bottom: 30rpx;
+}
+
+.welcome-text {
+  font-size: 32rpx;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.5;
+  max-width: 500rpx;
+}
+
+/* 消息项 */
+.message-item {
+  display: flex;
+  margin-bottom: 40rpx;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.user-message {
+  flex-direction: row-reverse;
+}
+
+.ai-message {
+  flex-direction: row;
+}
+
+.message-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 20rpx;
+  flex-shrink: 0;
+}
+
+.user-message .message-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.ai-message .message-avatar {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.avatar-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: white;
+  text-align: center;
+  line-height: 1;
+}
+
+/* 消息头像图片样式 */
+.message-avatar .avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.message-avatar .avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.message-content {
+  flex: 1;
+  max-width: 70%;
+}
+
+.message-bubble {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.user-message .message-bubble {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ai-message .message-bubble {
+  background: rgba(255, 255, 255, 0.95);
+  color: #333;
+  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.message-text {
+  font-size: 28rpx;
+  line-height: 1.6;
+  word-wrap: break-word;
+  font-weight: 400;
+}
+
+.user-message .message-text {
+  color: white;
+}
+
+.ai-message .message-text {
+  color: #333;
+  width: 100%;
+}
+
+/* 流式输出指示器 */
+.streaming-indicator {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8rpx;
+  gap: 4rpx;
+}
+
+.streaming-dot {
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background: #667eea;
+  animation: streamingPulse 1.4s infinite ease-in-out;
+}
+
+.streaming-dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.streaming-dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.streaming-dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes streamingPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Markdown 样式美化 */
+.message-text {
+  font-size: 28rpx;
+  line-height: 1.6;
+  word-wrap: break-word;
+  font-weight: 400;
+}
+
+/* 代码块样式 */
+.message-text .wemark-code {
+  background: #f6f8fa;
+  border: 1px solid #e1e4e8;
+  border-radius: 12rpx;
+  padding: 20rpx;
+  margin: 16rpx 0;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 24rpx;
+  line-height: 1.5;
+  overflow-x: auto;
+}
+
+/* 行内代码样式 */
+.message-text .wemark-inline-code {
+  background: #f1f3f4;
+  color: #d73a49;
+  padding: 4rpx 8rpx;
+  border-radius: 6rpx;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 24rpx;
+}
+
+/* 标题样式 */
+.message-text .wemark-h1 {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin: 24rpx 0 16rpx 0;
+  color: #24292e;
+  border-bottom: 2px solid #e1e4e8;
+  padding-bottom: 8rpx;
+}
+
+.message-text .wemark-h2 {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin: 20rpx 0 12rpx 0;
+  color: #24292e;
+}
+
+.message-text .wemark-h3 {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin: 16rpx 0 8rpx 0;
+  color: #24292e;
+}
+
+/* 列表样式 */
+.message-text .wemark-ul,
+.message-text .wemark-ol {
+  margin: 16rpx 0;
+  padding-left: 32rpx;
+}
+
+.message-text .wemark-li {
+  margin: 8rpx 0;
+  line-height: 1.6;
+}
+
+/* 引用样式 */
+.message-text .wemark-blockquote {
+  border-left: 4px solid #667eea;
+  background: rgba(102, 126, 234, 0.05);
+  padding: 16rpx 20rpx;
+  margin: 16rpx 0;
+  border-radius: 0 8rpx 8rpx 0;
+  font-style: italic;
+  color: #586069;
+}
+
+/* 链接样式 */
+.message-text .wemark-link {
+  color: #667eea;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 0.2s ease;
+}
+
+.message-text .wemark-link:hover {
+  border-bottom-color: #667eea;
+}
+
+/* 加粗样式 */
+.message-text .wemark-strong {
+  font-weight: 600;
+  color: #24292e;
+}
+
+/* 斜体样式 */
+.message-text .wemark-em {
+  font-style: italic;
+  color: #586069;
+}
+
+/* 分割线样式 */
+.message-text .wemark-hr {
+  border: none;
+  border-top: 1px solid #e1e4e8;
+  margin: 24rpx 0;
+}
+
+/* 表格样式 */
+.message-text .wemark-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16rpx 0;
+  font-size: 24rpx;
+}
+
+.message-text .wemark-table th,
+.message-text .wemark-table td {
+  border: 1px solid #e1e4e8;
+  padding: 12rpx 16rpx;
+  text-align: left;
+}
+
+.message-text .wemark-table th {
+  background: #f6f8fa;
+  font-weight: 600;
+  color: #24292e;
+}
+
+.message-text .wemark-table tr:nth-child(even) {
+  background: #f8f9fa;
+}
+
+.message-time {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 12rpx;
+  text-align: right;
+}
+
+.ai-message .message-time {
+  color: rgba(0, 0, 0, 0.5);
+  text-align: left;
+}
+
+/* 加载状态 */
+.loading-message {
+  display: flex;
+  margin-bottom: 40rpx;
+}
+
+.loading-bubble {
+  background: rgba(255, 255, 255, 0.95);
+  min-width: 120rpx;
+}
+
+.loading-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+}
+
+.dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  background: #999;
+  animation: loadingDot 1.4s infinite ease-in-out;
+}
+
+.dot:nth-child(1) { animation-delay: -0.32s; }
+.dot:nth-child(2) { animation-delay: -0.16s; }
+
+/* 底部输入区域 */
+.input-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12rpx 30rpx;
+  padding-bottom: calc(12rpx + env(safe-area-inset-bottom));
+  box-shadow: 0 -2rpx 20rpx rgba(0, 0, 0, 0.05);
+  position: relative;
+  z-index: 10;
+  min-height: 100rpx;
+  display: block !important;
+  visibility: visible !important;
+}
+
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 28rpx;
+  padding: 8rpx 20rpx;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 2rpx 8rpx rgba(0, 0, 0, 0.05);
+}
+
+.message-input {
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.5;
+  max-height: 120rpx;
+  min-height: 32rpx;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: #333;
+  padding: 6rpx 0;
+  margin: 0;
+}
+
+.message-input::placeholder {
+  color: #999;
+  line-height: 1.5;
+  vertical-align: middle;
+}
+
+.send-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12rpx 24rpx;
+  border-radius: 24rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.send-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.send-btn:active::before {
+  opacity: 1;
+}
+
+.send-btn.active {
+  transform: scale(1.02);
+  box-shadow: 0 6rpx 20rpx rgba(102, 126, 234, 0.4);
+}
+
+.send-btn:not(.active) {
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  color: #6c757d;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.send-icon {
+  position: relative;
+  z-index: 1;
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loadingDot {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 用户头像样式 */
+.user-avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  border: 2rpx solid rgba(255, 255, 255, 0.8);
+}
+
+.user-avatar:active {
+  transform: scale(0.95);
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.15);
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.avatar-placeholder .avatar-text {
+  font-size: 28rpx;
+  color: white;
+}
