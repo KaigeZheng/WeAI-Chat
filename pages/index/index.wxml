@@ -1,5 +1,5 @@
 <!--index.wxml-->
-<view class="chat-container {{themeClass}}" data-theme="{{pageTheme}}">
+<view class="chat-container {{themeClass}}" data-theme="{{pageTheme}}" bindtap="onPageTap">
   <!-- 安全区域适配 -->
   <view class="safe-area-top"></view>
   
@@ -71,6 +71,18 @@
               <view class="streaming-dot"></view>
             </view>
           </view>
+          
+          <!-- AI消息的复制按钮 -->
+          <view wx:if="{{item.role === 'assistant' && item.content && !item.isStreaming}}" class="copy-actions">
+            <view class="copy-btn" data-type="text" data-content="{{item.content}}" bindtap="copyMessage">
+              <text class="copy-icon">📋</text>
+              <text class="copy-text">复制文本</text>
+            </view>
+            <view class="copy-btn" data-type="markdown" data-content="{{item.content}}" bindtap="copyMessage">
+              <text class="copy-icon">📝</text>
+              <text class="copy-text">复制Markdown</text>
+            </view>
+          </view>
         </view>
       </view>
     </view>
@@ -78,10 +90,37 @@
 
   <!-- 底部输入区域 -->
   <view class="input-container">
+    <!-- 对话风格选择器 -->
+    <view class="style-selector" catchtap="onStyleSelectorTap">
+      <view class="current-style" bindtap="toggleStyleMenu">
+        <view class="style-icon">{{styleConfigs[currentStyle].icon}}</view>
+        <text class="style-name">{{styleConfigs[currentStyle].name}}</text>
+        <view class="style-arrow {{showStyleMenu ? 'rotate' : ''}}">▼</view>
+      </view>
+      
+      <!-- 风格选择菜单 -->
+      <view class="style-menu {{showStyleMenu ? 'show' : ''}}" wx:if="{{showStyleMenu}}">
+        <view 
+          wx:for="{{styleConfigs}}" 
+          wx:key="key"
+          class="style-option {{currentStyle === item.key ? 'active' : ''}}"
+          data-style="{{item.key}}"
+          bindtap="selectStyle"
+        >
+          <view class="style-option-icon">{{item.icon}}</view>
+          <view class="style-option-content">
+            <text class="style-option-name">{{item.name}}</text>
+            <text class="style-option-desc">{{item.description}}</text>
+          </view>
+          <view class="style-option-check" wx:if="{{currentStyle === item.key}}">✓</view>
+        </view>
+      </view>
+    </view>
+    
     <view class="input-wrapper">
       <textarea 
         class="message-input" 
-        placeholder="输入你的问题..." 
+        placeholder="{{styleConfigs[currentStyle].placeholder}}" 
         value="{{inputMessage}}"
         bindinput="onInputChange"
         bindconfirm="sendMessage"
@@ -93,7 +132,7 @@
         hold-keyboard="false"
         disable-default-padding="true"
       ></textarea>
-      <view class="send-btn {{inputMessage.trim() ? 'active' : ''}}" bindtap="sendMessage">
+      <view class="send-btn {{hasInputContent ? 'active' : ''}}" bindtap="sendMessage">
         <text class="send-icon">发送</text>
       </view>
     </view>

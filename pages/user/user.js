@@ -3,9 +3,26 @@ Page({
     userInfo: {
       avatarUrl: '',
       nickName: '',
-      gender: 0
+      gender: 0,
+      profession: 0,
+      hobbies: [],
+      aiStyle: 0
     },
     genderOptions: ['未知', '男', '女'],
+    professionOptions: ['学生', '程序员', '设计师', '教师', '医生', '销售', '管理', '其他'],
+    hobbyOptions: [
+      { key: 'reading', name: '阅读', icon: '📚' },
+      { key: 'music', name: '音乐', icon: '🎵' },
+      { key: 'sports', name: '运动', icon: '⚽' },
+      { key: 'travel', name: '旅行', icon: '✈️' },
+      { key: 'cooking', name: '烹饪', icon: '🍳' },
+      { key: 'gaming', name: '游戏', icon: '🎮' },
+      { key: 'photography', name: '摄影', icon: '📷' },
+      { key: 'art', name: '艺术', icon: '🎨' },
+      { key: 'technology', name: '科技', icon: '💻' },
+      { key: 'nature', name: '自然', icon: '🌿' }
+    ],
+    aiStyleOptions: ['专业严谨', '友好亲切', '简洁明了', '幽默风趣', '详细深入'],
     isDarkMode: false,
     pageTheme: 'light',
     themeClass: 'theme-light'
@@ -61,7 +78,10 @@ Page({
     const userInfo = wx.getStorageSync('userInfo') || {
       avatarUrl: '',
       nickName: '',
-      gender: 0
+      gender: 0,
+      profession: 0,
+      hobbies: [],
+      aiStyle: 0
     };
     this.setData({
       userInfo: userInfo
@@ -109,19 +129,63 @@ Page({
     });
   },
 
+  // 职业选择
+  onProfessionChange: function(e) {
+    this.setData({
+      'userInfo.profession': parseInt(e.detail.value)
+    });
+  },
+
+  // 切换兴趣爱好
+  toggleHobby: function(e) {
+    const hobbyKey = e.currentTarget.dataset.hobby;
+    const hobbies = [...this.data.userInfo.hobbies];
+    
+    if (hobbies.includes(hobbyKey)) {
+      // 移除兴趣爱好
+      const index = hobbies.indexOf(hobbyKey);
+      hobbies.splice(index, 1);
+    } else {
+      // 添加兴趣爱好（不限制数量）
+      hobbies.push(hobbyKey);
+    }
+    
+    this.setData({
+      'userInfo.hobbies': hobbies
+    });
+  },
+
+  // 回答风格选择
+  onAiStyleChange: function(e) {
+    this.setData({
+      'userInfo.aiStyle': parseInt(e.detail.value)
+    });
+  },
+
   // 保存用户信息
   saveUserInfo: function() {
     const userInfo = this.data.userInfo;
     
-    // 验证昵称
+    // 验证昵称（昵称可以为空，但建议填写）
     if (!userInfo.nickName.trim()) {
-      wx.showToast({
-        title: '请输入昵称',
-        icon: 'none'
+      wx.showModal({
+        title: '昵称为空',
+        content: '昵称为空，是否继续保存？',
+        success: (res) => {
+          if (res.confirm) {
+            this.saveUserInfoToStorage(userInfo);
+          }
+        }
       });
       return;
     }
 
+    // 直接保存
+    this.saveUserInfoToStorage(userInfo);
+  },
+
+  // 保存用户信息到存储
+  saveUserInfoToStorage: function(userInfo) {
     // 保存到本地存储
     wx.setStorageSync('userInfo', userInfo);
     
@@ -153,7 +217,10 @@ Page({
           const defaultUserInfo = {
             avatarUrl: '',
             nickName: '',
-            gender: 0
+            gender: 0,
+            profession: 0,
+            hobbies: [],
+            aiStyle: 0
           };
           this.setData({
             userInfo: defaultUserInfo

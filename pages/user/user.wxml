@@ -19,13 +19,46 @@
     <view class="info-section">
       <view class="info-item">
         <text class="label">昵称</text>
-        <input class="input" value="{{userInfo.nickName}}" placeholder="请输入昵称" bindinput="onNickNameInput" />
+        <input class="input" value="{{userInfo.nickName}}" placeholder="请输入昵称（选填）" bindinput="onNickNameInput" />
       </view>
       
       <view class="info-item">
         <text class="label">性别</text>
         <picker class="picker" range="{{genderOptions}}" value="{{userInfo.gender}}" bindchange="onGenderChange">
           <view class="picker-text">{{genderOptions[userInfo.gender]}}</view>
+        </picker>
+      </view>
+
+      <view class="info-item">
+        <text class="label">职业</text>
+        <picker class="picker" range="{{professionOptions}}" value="{{userInfo.profession}}" bindchange="onProfessionChange">
+          <view class="picker-text">{{professionOptions[userInfo.profession]}}</view>
+        </picker>
+      </view>
+
+      <view class="info-item">
+        <text class="label">兴趣爱好</text>
+        <view class="hobby-container">
+          <view class="hobby-tags">
+            <view 
+              wx:for="{{hobbyOptions}}" 
+              wx:key="key"
+              class="hobby-tag {{userInfo.hobbies.includes(item.key) ? 'active' : ''}}"
+              data-hobby="{{item.key}}"
+              bindtap="toggleHobby"
+            >
+              <text class="hobby-icon">{{item.icon}}</text>
+              <text class="hobby-text">{{item.name}}</text>
+            </view>
+          </view>
+          <text class="field-hint">可选择多个或跳过</text>
+        </view>
+      </view>
+
+      <view class="info-item">
+        <text class="label">回答风格</text>
+        <picker class="picker" range="{{aiStyleOptions}}" value="{{userInfo.aiStyle}}" bindchange="onAiStyleChange">
+          <view class="picker-text">{{aiStyleOptions[userInfo.aiStyle]}}</view>
         </picker>
       </view>
     </view>

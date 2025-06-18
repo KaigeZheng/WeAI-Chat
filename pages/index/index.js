@@ -16,21 +16,64 @@ Page({
       userId: '' // 添加用户ID字段
     },
     isDarkMode: false, // 添加夜间模式状态
-    forceUpdate: 0
+    forceUpdate: 0,
+    hasInputContent: false, // 控制发送按钮状态的布尔值
+    // 对话风格选择器相关数据
+    currentStyle: 'general', // 当前选中的风格
+    showStyleMenu: false, // 是否显示风格选择菜单
+    styleConfigs: {
+      general: {
+        key: 'general',
+        name: '通用对话',
+        icon: '💬',
+        description: '自由对话，无特殊限制',
+        placeholder: '输入你的问题...',
+        systemPrompt: '你是一个有用的AI助手，请根据用户的问题提供准确、有帮助的回答。'
+      },
+      codeComment: {
+        key: 'codeComment',
+        name: '注释生成',
+        icon: '📝',
+        description: '为代码添加详细注释',
+        placeholder: '请上传需要添加注释的代码...',
+        systemPrompt: '你是一个专业的代码注释生成器。请为用户提供的代码添加详细、清晰的中文注释，包括函数说明、参数解释、返回值说明等。注释应该简洁明了，帮助理解代码逻辑。'
+      },
+      textGeneration: {
+        key: 'textGeneration',
+        name: '文本生成',
+        icon: '✍️',
+        description: '根据内容生成说明文档',
+        placeholder: '请提供需要生成说明的内容...',
+        systemPrompt: '你是一个专业的文档生成器。请根据用户提供的内容（代码、文本等）生成详细、结构化的说明文档。文档应该包含概述、详细说明、使用示例等部分，使用中文编写。'
+      },
+      translation: {
+        key: 'translation',
+        name: '翻译模式',
+        icon: '🌐',
+        description: '自动翻译为英文',
+        placeholder: '输入需要翻译的内容...',
+        systemPrompt: '你是一个专业的翻译助手。请将用户输入的中文内容翻译成英文。如果用户指定了其他目标语言，请翻译为指定语言。翻译应该准确、自然，保持原文的意思和语气。'
+      },
+      search: {
+        key: 'search',
+        name: '搜索模式',
+        icon: '🔍',
+        description: '言简意赅的搜索回答',
+        placeholder: '输入你的搜索问题...',
+        systemPrompt: '你是一个高效的搜索助手。请针对用户的问题提供言简意赅、直接有效的回答。回答应该简洁明了，突出重点，避免冗长的解释。'
+      }
+    }
   },
 
   onLoad: function (options) {
     // 获取用户信息
     this.getUserProfile();
     
-    // 从本地存储加载聊天记录
-    const messages = wx.getStorageSync('chat_messages') || [];
-    this.setData({
-      messages: messages
-    });
-    
     // 加载用户设置
     this.loadUserSettings();
+    
+    // 加载风格设置
+    this.loadStyleSettings();
     
     // 检查API Key是否已配置
     this.checkAPIKey();
@@ -40,6 +83,11 @@ Page({
     
     // 处理历史消息，确保有用户ID和模型ID
     this.loadMessages();
+    
+    // 确保hasInputContent初始状态正确
+    this.setData({
+      hasInputContent: false
+    });
   },
 
   onShow: function() {
@@ -176,7 +224,19 @@ Page({
       return processedMsg;
     });
     
-    this.setData({ messages: processedMessages });
+    // 确保messageId正确初始化，避免ID重复
+    if (processedMessages.length > 0) {
+      const maxId = Math.max(...processedMessages.map(msg => msg.id || 0));
+      this.setData({ 
+        messages: processedMessages,
+        messageId: maxId
+      });
+    } else {
+      this.setData({ 
+        messages: processedMessages,
+        messageId: 0
+      });
+    }
   },
 
   // 保存消息到本地存储
@@ -186,8 +246,14 @@ Page({
 
   // 输入框内容变化
   onInputChange(e) {
+    const value = e.detail.value;
+    const hasContent = value.trim().length > 0;
+    
+    console.log('输入内容变化:', value, 'hasContent:', hasContent);
+    
     this.setData({
-      inputMessage: e.detail.value
+      inputMessage: value,
+      hasInputContent: hasContent
     });
   },
 
@@ -225,6 +291,8 @@ Page({
       userId: this.data.userInfo.userId
     };
 
+    console.log('创建用户消息，ID:', userMessage.id);
+
     // 添加AI消息占位符
     const aiMessage = {
       id: ++this.data.messageId,
@@ -236,9 +304,13 @@ Page({
       modelId: this.data.currentService
     };
 
+    console.log('创建AI消息占位符，ID:', aiMessage.id);
+    console.log('当前消息列表长度:', this.data.messages.length);
+
     this.setData({
       messages: [...this.data.messages, userMessage, aiMessage],
       inputMessage: '',
+      hasInputContent: false,
       isLoading: true,
       scrollToMessage: `msg-${aiMessage.id}`
     });
@@ -278,28 +350,79 @@ Page({
     // 检查是否启用上下文功能
     const enableContext = wx.getStorageSync('enable_context') !== false; // 默认开启
     
+    // 获取当前风格的系统提示词
+    const currentStyleConfig = this.data.styleConfigs[this.data.currentStyle];
+    let systemPrompt = currentStyleConfig.systemPrompt;
+    
+    // 根据用户信息调整系统提示词
+    const userInfo = this.data.userInfo;
+    if (userInfo) {
+      let userContext = '';
+      
+      // 添加职业信息（如果选择了职业）
+      if (userInfo.profession !== undefined && userInfo.profession > 0) {
+        const professionOptions = ['学生', '程序员', '设计师', '教师', '医生', '销售', '管理', '其他'];
+        const profession = professionOptions[userInfo.profession];
+        userContext += `用户职业：${profession}。`;
+      }
+      
+      // 添加兴趣爱好信息（如果选择了兴趣爱好）
+      if (userInfo.hobbies && userInfo.hobbies.length > 0) {
+        const hobbyOptions = {
+          'reading': '阅读',
+          'music': '音乐',
+          'sports': '运动',
+          'travel': '旅行',
+          'cooking': '烹饪',
+          'gaming': '游戏',
+          'photography': '摄影',
+          'art': '艺术',
+          'technology': '科技',
+          'nature': '自然'
+        };
+        const hobbies = userInfo.hobbies.map(key => hobbyOptions[key]).join('、');
+        userContext += `用户兴趣爱好：${hobbies}。`;
+      }
+      
+      // 添加AI回答风格（如果选择了风格）
+      if (userInfo.aiStyle !== undefined && userInfo.aiStyle > 0) {
+        const aiStyleOptions = ['专业严谨', '友好亲切', '简洁明了', '幽默风趣', '详细深入'];
+        const aiStyle = aiStyleOptions[userInfo.aiStyle];
+        userContext += `请以${aiStyle}的风格回答。`;
+      }
+      
+      // 将用户上下文添加到系统提示词中（只有在有内容时才添加）
+      if (userContext) {
+        systemPrompt = systemPrompt.replace('。', `。${userContext}`);
+        console.log('添加用户上下文:', userContext);
+      }
+    }
+    
     if (!enableContext) {
       // 如果不启用上下文，只发送当前消息
-      let simplePrompt = 'system: 你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。\n\n';
+      let simplePrompt = `system: ${systemPrompt}\n\n`;
       simplePrompt += `user: ${currentMessage}\n\n`;
       simplePrompt += 'ai: ';
       return simplePrompt;
     }
     
-    const messages = this.data.messages;
+    // 创建消息列表的副本，避免影响原始数据
+    const messages = [...this.data.messages];
     const maxContextLength = 10; // 最大上下文消息数量
     
     // 获取最近的对话历史（限制数量以避免token超限）
     const recentMessages = messages.slice(-maxContextLength);
     
+    console.log('构建上下文，使用最近', recentMessages.length, '条消息');
+    
     // 构建完整的对话上下文
     let contextPrompt = '';
     
-    // 添加系统提示词
-    contextPrompt += 'system: 你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。\n\n';
+    // 添加系统提示词（使用当前风格的系统提示词）
+    contextPrompt += `system: ${systemPrompt}\n\n`;
     
     // 添加历史对话记录
-    recentMessages.forEach(msg => {
+    recentMessages.forEach((msg, index) => {
       if (msg.role === 'user') {
         contextPrompt += `user: ${msg.content}\n\n`;
       } else if (msg.role === 'assistant') {
@@ -311,7 +434,7 @@ Page({
     contextPrompt += `user: ${currentMessage}\n\n`;
     contextPrompt += 'ai: ';
     
-    console.log('构建的上下文prompt:', contextPrompt);
+    console.log('构建的上下文prompt长度:', contextPrompt.length);
     return contextPrompt;
   },
 
@@ -485,7 +608,7 @@ Page({
       
       // 添加超时处理
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('API调用超时')), 3000); // 3秒超时
+        setTimeout(() => reject(new Error('API调用超时')), 30000); // 30秒超时
       });
       
       const apiPromise = callAIAPIStream(userMessage, currentService, (chunk) => {
@@ -500,9 +623,19 @@ Page({
             const messages = [...this.data.messages];
             const messageIndex = messages.findIndex(msg => msg.id === aiMessageId);
             if (messageIndex !== -1) {
-              messages[messageIndex] = { ...messages[messageIndex], content: fullContent };
+              // 只更新指定消息的内容，保持其他属性不变
+              const updatedMessage = {
+                ...messages[messageIndex],
+                content: fullContent
+              };
+              messages[messageIndex] = updatedMessage;
+              
+              console.log('更新消息ID:', aiMessageId, '内容长度:', fullContent.length);
+              
               this.setData({ messages });
               this.scrollToBottom();
+            } else {
+              console.warn('未找到要更新的消息ID:', aiMessageId);
             }
             this.updateTimer = null;
           }, 100); // 100ms节流
@@ -517,7 +650,11 @@ Page({
       // 完成流式输出，移除流式标记
       const messages = this.data.messages.map(msg => {
         if (msg.id === aiMessageId) {
-          return { ...msg, isStreaming: false };
+          return { 
+            ...msg, 
+            content: fullContent,
+            isStreaming: false 
+          };
         }
         return msg;
       });
@@ -600,8 +737,21 @@ Page({
         userInfo.userId = this.generateUserId();
         wx.setStorageSync('userInfo', userInfo);
       }
+      
+      // 确保新字段存在，提供默认值
+      const updatedUserInfo = {
+        avatarUrl: '',
+        nickName: '用户',
+        gender: 0,
+        profession: 0,
+        hobbies: [],
+        aiStyle: 0,
+        userId: this.generateUserId(),
+        ...userInfo
+      };
+      
       this.setData({
-        userInfo: userInfo
+        userInfo: updatedUserInfo
       });
     } else {
       // 如果没有用户信息，创建一个默认的用户信息
@@ -609,6 +759,9 @@ Page({
         avatarUrl: '',
         nickName: '用户',
         gender: 0,
+        profession: 0,
+        hobbies: [],
+        aiStyle: 0,
         userId: this.generateUserId()
       };
       wx.setStorageSync('userInfo', defaultUserInfo);
@@ -642,63 +795,150 @@ Page({
   // 测试wemark组件
   testWemark() {
     const testMessage = {
-      id: ++this.data.messageId,
-      role: 'user',
-      content: '请测试markdown渲染功能',
-      time: this.formatTime(new Date()),
-      userId: this.data.userInfo.userId
-    };
-
-    const testAiMessage = {
-      id: ++this.data.messageId,
+      id: this.data.messageId++,
       role: 'assistant',
-      content: `# Markdown 测试
-
-这是一个 **markdown** 渲染测试。
-
-## 代码示例
-
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
-}
-\`\`\`
-
-## 列表
-
-- 项目 1
-- 项目 2
-- 项目 3
-
-## 引用
-
-> 这是一个引用示例
-
-## 链接
-
-[点击这里](https://example.com)
-
-## 表格
-
-| 列1 | 列2 | 列3 |
-|-----|-----|-----|
-| 数据1 | 数据2 | 数据3 |
-| 数据4 | 数据5 | 数据6 |
-
-## 行内代码
-
-这里有一些 \`行内代码\` 示例。`,
+      content: '# 测试Markdown\n\n这是一个**粗体**文本，这是*斜体*文本。\n\n## 代码示例\n\n```javascript\nfunction hello() {\n  console.log("Hello World!");\n}\n```\n\n## 列表\n\n- 项目1\n- 项目2\n- 项目3\n\n## 表格\n\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 数据1 | 数据2 | 数据3 |\n| 数据4 | 数据5 | 数据6 |',
       time: this.formatTime(new Date()),
       model: this.data.currentService,
-      isStreaming: false,
       modelId: this.data.currentService
     };
-
+    
     this.setData({
-      messages: [...this.data.messages, testMessage, testAiMessage],
-      scrollToMessage: `msg-${testAiMessage.id}`
+      messages: [...this.data.messages, testMessage]
     });
-
+    
     this.saveMessages();
+    this.scrollToBottom();
   },
+
+  // 风格选择器相关方法
+  
+  // 切换风格选择菜单
+  toggleStyleMenu() {
+    this.setData({
+      showStyleMenu: !this.data.showStyleMenu
+    });
+  },
+
+  // 选择对话风格
+  selectStyle(e) {
+    const styleKey = e.currentTarget.dataset.style;
+    this.setData({
+      currentStyle: styleKey,
+      showStyleMenu: false
+    });
+    
+    // 保存用户选择的风格到本地存储
+    wx.setStorageSync('selected_style', styleKey);
+  },
+
+  // 点击外部关闭风格选择菜单
+  onPageTap() {
+    if (this.data.showStyleMenu) {
+      this.setData({
+        showStyleMenu: false
+      });
+    }
+  },
+
+  // 防止风格选择器点击事件冒泡
+  onStyleSelectorTap() {
+    // 空方法，用于阻止事件冒泡
+  },
+
+  // 加载用户保存的风格设置
+  loadStyleSettings() {
+    const savedStyle = wx.getStorageSync('selected_style') || 'general';
+    this.setData({
+      currentStyle: savedStyle
+    });
+  },
+
+  // 复制消息内容
+  copyMessage(e) {
+    const type = e.currentTarget.dataset.type;
+    const content = e.currentTarget.dataset.content;
+    
+    let textToCopy = '';
+    
+    if (type === 'text') {
+      // 复制纯文本（去除Markdown格式）
+      textToCopy = this.stripMarkdown(content);
+    } else if (type === 'markdown') {
+      // 复制原始Markdown内容
+      textToCopy = content;
+    }
+    
+    // 复制到剪贴板
+    wx.setClipboardData({
+      data: textToCopy,
+      success: () => {
+        // 显示复制成功提示
+        wx.showToast({
+          title: type === 'text' ? '文本已复制' : 'Markdown已复制',
+          icon: 'success',
+          duration: 1500
+        });
+      },
+      fail: () => {
+        wx.showToast({
+          title: '复制失败',
+          icon: 'error'
+        });
+      }
+    });
+  },
+
+  // 去除Markdown格式，转换为纯文本
+  stripMarkdown(markdown) {
+    if (!markdown) return '';
+    
+    let text = markdown;
+    
+    // 移除代码块
+    text = text.replace(/```[\s\S]*?```/g, '');
+    
+    // 移除行内代码
+    text = text.replace(/`([^`]+)`/g, '$1');
+    
+    // 移除标题
+    text = text.replace(/^#{1,6}\s+/gm, '');
+    
+    // 移除粗体和斜体
+    text = text.replace(/\*\*([^*]+)\*\*/g, '$1');
+    text = text.replace(/\*([^*]+)\*/g, '$1');
+    text = text.replace(/__([^_]+)__/g, '$1');
+    text = text.replace(/_([^_]+)_/g, '$1');
+    
+    // 移除删除线
+    text = text.replace(/~~([^~]+)~~/g, '$1');
+    
+    // 移除链接，保留链接文本
+    text = text.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1');
+    
+    // 移除图片
+    text = text.replace(/!\[([^\]]*)\]\([^)]+\)/g, '$1');
+    
+    // 移除引用
+    text = text.replace(/^>\s+/gm, '');
+    
+    // 移除列表标记
+    text = text.replace(/^[\s]*[-*+]\s+/gm, '');
+    text = text.replace(/^[\s]*\d+\.\s+/gm, '');
+    
+    // 移除表格标记
+    text = text.replace(/\|/g, ' ');
+    text = text.replace(/^[\s]*[-|]+\s*$/gm, '');
+    
+    // 移除水平分割线
+    text = text.replace(/^[\s]*[-*_]{3,}\s*$/gm, '');
+    
+    // 清理多余的空行
+    text = text.replace(/\n\s*\n\s*\n/g, '\n\n');
+    
+    // 清理首尾空白
+    text = text.trim();
+    
+    return text;
+  }
 });

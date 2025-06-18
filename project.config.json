@@ -14,7 +14,16 @@
     "useCompilerPlugins": false,
     "minifyWXML": true,
     "urlCheck": false,
-    "checkSiteMap": false
+    "checkSiteMap": false,
+    "compileWorklet": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "minifyWXSS": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true
   },
   "compileType": "miniprogram",
   "simulatorPluginLibVersion": {},
@@ -28,5 +37,6 @@
     "miniprogram": {
       "list": []
     }
-  }
+  },
+  "libVersion": "3.8.8"
 }
