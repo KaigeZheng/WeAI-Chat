@@ -38,6 +38,14 @@ Page({
     this.getUserProfile();
   },
 
+  onUnload: function() {
+    // 清理定时器
+    if (this.updateTimer) {
+      clearTimeout(this.updateTimer);
+      this.updateTimer = null;
+    }
+  },
+
   // 加载用户设置
   loadUserSettings() {
     const defaultService = wx.getStorageSync('default_service') || 0;
@@ -155,6 +163,8 @@ Page({
       model: currentService,
       isStreaming: true // 标记为流式输出
     };
+
+    console.log('创建AI消息:', aiMessage);
 
     this.setData({
       messages: [...this.data.messages, userMessage, aiMessage],
@@ -352,16 +362,20 @@ Page({
         // 处理每个文本块
         fullContent += chunk;
         
-        // 更新消息内容
-        const messages = this.data.messages.map(msg => {
-          if (msg.id === aiMessageId) {
-            return { ...msg, content: fullContent };
-          }
-          return msg;
-        });
-        
-        this.setData({ messages });
-        this.scrollToBottom();
+        // 使用节流来减少setData调用频率
+        if (!this.updateTimer) {
+          this.updateTimer = setTimeout(() => {
+            // 更新消息内容，使用更高效的方式
+            const messages = [...this.data.messages];
+            const messageIndex = messages.findIndex(msg => msg.id === aiMessageId);
+            if (messageIndex !== -1) {
+              messages[messageIndex] = { ...messages[messageIndex], content: fullContent };
+              this.setData({ messages });
+              this.scrollToBottom();
+            }
+            this.updateTimer = null;
+          }, 100); // 100ms节流
+        }
       });
       
       // 使用Promise.race来处理超时
@@ -468,5 +482,66 @@ Page({
     wx.navigateTo({
       url: '/pages/settings/settings'
     });
+  },
+
+  // 测试wemark组件
+  testWemark() {
+    const testMessage = {
+      id: ++this.data.messageId,
+      role: 'user',
+      content: '请测试markdown渲染功能',
+      time: this.formatTime(new Date())
+    };
+
+    const testAiMessage = {
+      id: ++this.data.messageId,
+      role: 'assistant',
+      content: `# Markdown 测试
+
+这是一个 **markdown** 渲染测试。
+
+## 代码示例
+
+\`\`\`javascript
+function hello() {
+  console.log("Hello, World!");
+}
+\`\`\`
+
+## 列表
+
+- 项目 1
+- 项目 2
+- 项目 3
+
+## 引用
+
+> 这是一个引用示例
+
+## 链接
+
+[点击这里](https://example.com)
+
+## 表格
+
+| 列1 | 列2 | 列3 |
+|-----|-----|-----|
+| 数据1 | 数据2 | 数据3 |
+| 数据4 | 数据5 | 数据6 |
+
+## 行内代码
+
+这里有一些 \`行内代码\` 示例。`,
+      time: this.formatTime(new Date()),
+      model: this.data.currentService,
+      isStreaming: false
+    };
+
+    this.setData({
+      messages: [...this.data.messages, testMessage, testAiMessage],
+      scrollToMessage: `msg-${testAiMessage.id}`
+    });
+
+    this.saveMessages();
   },
 });

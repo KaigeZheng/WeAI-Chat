@@ -58,8 +58,9 @@
         </view>
         <view class="message-content">
           <view class="message-bubble">
-            <!-- <wemark wx:if="{{item.role === 'assistant'}}" md="{{item.content}}" link highlight class="message-text"></wemark> -->
-            <text class="message-text" user-select="true">{{item.content}}</text>
+            <wemark wx:if="{{item.role === 'assistant' && item.content}}" md="{{item.content}}" link highlight wx:key="content"></wemark>
+            <text wx:if="{{item.role === 'assistant' && !item.content}}" class="message-text">正在思考中...</text>
+            <text wx:if="{{item.role === 'user'}}" class="message-text" user-select="true">{{item.content}}</text>
             <view wx:if="{{item.isStreaming}}" class="streaming-indicator">
               <view class="streaming-dot"></view>
               <view class="streaming-dot"></view>

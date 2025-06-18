@@ -344,8 +344,44 @@ page {
   font-weight: 400;
 }
 
-/* 代码块样式 */
-.message-text .wemark-code {
+/* wemark组件在AI消息中的样式 */
+.ai-message .message-bubble .wemark_wrapper {
+  margin: 0;
+  font-size: 28rpx;
+  line-height: 1.6;
+  color: #333;
+  width: 100%;
+}
+
+.ai-message .message-bubble .wemark_wrapper .wemark_block_p {
+  margin: 8rpx 0;
+  word-wrap: break-word;
+}
+
+.ai-message .message-bubble .wemark_wrapper .wemark_block_h1 {
+  font-size: 36rpx;
+  font-weight: 700;
+  margin: 24rpx 0 16rpx 0;
+  color: #24292e;
+  border-bottom: 2px solid #e1e4e8;
+  padding-bottom: 8rpx;
+}
+
+.ai-message .message-bubble .wemark_wrapper .wemark_block_h2 {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin: 20rpx 0 12rpx 0;
+  color: #24292e;
+}
+
+.ai-message .message-bubble .wemark_wrapper .wemark_block_h3 {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin: 16rpx 0 8rpx 0;
+  color: #24292e;
+}
+
+.ai-message .message-bubble .wemark_wrapper .wemark_block_code {
   background: #f6f8fa;
   border: 1px solid #e1e4e8;
   border-radius: 12rpx;
@@ -355,10 +391,11 @@ page {
   font-size: 24rpx;
   line-height: 1.5;
   overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
 
-/* 行内代码样式 */
-.message-text .wemark-inline-code {
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_code {
   background: #f1f3f4;
   color: #d73a49;
   padding: 4rpx 8rpx;
@@ -367,44 +404,7 @@ page {
   font-size: 24rpx;
 }
 
-/* 标题样式 */
-.message-text .wemark-h1 {
-  font-size: 36rpx;
-  font-weight: 700;
-  margin: 24rpx 0 16rpx 0;
-  color: #24292e;
-  border-bottom: 2px solid #e1e4e8;
-  padding-bottom: 8rpx;
-}
-
-.message-text .wemark-h2 {
-  font-size: 32rpx;
-  font-weight: 600;
-  margin: 20rpx 0 12rpx 0;
-  color: #24292e;
-}
-
-.message-text .wemark-h3 {
-  font-size: 28rpx;
-  font-weight: 600;
-  margin: 16rpx 0 8rpx 0;
-  color: #24292e;
-}
-
-/* 列表样式 */
-.message-text .wemark-ul,
-.message-text .wemark-ol {
-  margin: 16rpx 0;
-  padding-left: 32rpx;
-}
-
-.message-text .wemark-li {
-  margin: 8rpx 0;
-  line-height: 1.6;
-}
-
-/* 引用样式 */
-.message-text .wemark-blockquote {
+.ai-message .message-bubble .wemark_wrapper .wemark_block_blockquote_p {
   border-left: 4px solid #667eea;
   background: rgba(102, 126, 234, 0.05);
   padding: 16rpx 20rpx;
@@ -414,60 +414,80 @@ page {
   color: #586069;
 }
 
-/* 链接样式 */
-.message-text .wemark-link {
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_link {
   color: #667eea;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-bottom-color 0.2s ease;
 }
 
-.message-text .wemark-link:hover {
-  border-bottom-color: #667eea;
-}
-
-/* 加粗样式 */
-.message-text .wemark-strong {
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_strong {
   font-weight: 600;
   color: #24292e;
 }
 
-/* 斜体样式 */
-.message-text .wemark-em {
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_em {
   font-style: italic;
   color: #586069;
 }
 
-/* 分割线样式 */
-.message-text .wemark-hr {
-  border: none;
-  border-top: 1px solid #e1e4e8;
-  margin: 24rpx 0;
-}
-
-/* 表格样式 */
-.message-text .wemark-table {
+.ai-message .message-bubble .wemark_wrapper .wemark_block_table {
   border-collapse: collapse;
   width: 100%;
   margin: 16rpx 0;
   font-size: 24rpx;
 }
 
-.message-text .wemark-table th,
-.message-text .wemark-table td {
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_table_th,
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_table_td {
   border: 1px solid #e1e4e8;
   padding: 12rpx 16rpx;
   text-align: left;
+  word-wrap: break-word;
 }
 
-.message-text .wemark-table th {
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_table_th {
   background: #f6f8fa;
   font-weight: 600;
   color: #24292e;
 }
 
-.message-text .wemark-table tr:nth-child(even) {
+.ai-message .message-bubble .wemark_wrapper .wemark_block_table_tr:nth-child(even) {
   background: #f8f9fa;
+}
+
+/* 列表样式 */
+.ai-message .message-bubble .wemark_wrapper .wemark_block_ul_li_p,
+.ai-message .message-bubble .wemark_wrapper .wemark_block_ol_li_p {
+  margin: 8rpx 0;
+  line-height: 1.6;
+}
+
+/* 分割线样式 */
+.ai-message .message-bubble .wemark_wrapper .wemark_block_hr {
+  border: none;
+  border-top: 1px solid #e1e4e8;
+  margin: 24rpx 0;
+}
+
+/* 移除旧的wemark样式，避免冲突 */
+.message-text .wemark-code,
+.message-text .wemark-inline-code,
+.message-text .wemark-h1,
+.message-text .wemark-h2,
+.message-text .wemark-h3,
+.message-text .wemark-ul,
+.message-text .wemark-ol,
+.message-text .wemark-li,
+.message-text .wemark-blockquote,
+.message-text .wemark-link,
+.message-text .wemark-strong,
+.message-text .wemark-em,
+.message-text .wemark-hr,
+.message-text .wemark-table,
+.message-text .wemark-table th,
+.message-text .wemark-table td {
+  display: none;
 }
 
 .message-time {
@@ -666,4 +686,60 @@ page {
 .avatar-placeholder .avatar-text {
   font-size: 28rpx;
   color: white;
+}
+
+/* 移动设备优化 */
+@media screen and (max-width: 750rpx) {
+  .ai-message .message-bubble .wemark_wrapper {
+    font-size: 26rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_block_h1 {
+    font-size: 32rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_block_h2 {
+    font-size: 28rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_block_h3 {
+    font-size: 26rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_block_code {
+    font-size: 22rpx;
+    padding: 16rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_inline_code {
+    font-size: 22rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_block_table {
+    font-size: 22rpx;
+  }
+  
+  .ai-message .message-bubble .wemark_wrapper .wemark_inline_table_th,
+  .ai-message .message-bubble .wemark_wrapper .wemark_inline_table_td {
+    padding: 8rpx 12rpx;
+  }
+}
+
+/* 确保代码块在移动设备上可以横向滚动 */
+.ai-message .message-bubble .wemark_wrapper .wemark_block_code {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 优化表格在移动设备上的显示 */
+.ai-message .message-bubble .wemark_wrapper .wemark_block_table {
+  min-width: 100%;
+  table-layout: fixed;
+}
+
+/* 确保链接在小屏幕上也能正常点击 */
+.ai-message .message-bubble .wemark_wrapper .wemark_inline_link {
+  min-height: 44rpx;
+  display: inline-flex;
+  align-items: center;
 }
