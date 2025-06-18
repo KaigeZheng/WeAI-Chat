@@ -1,4 +1,123 @@
 /**app.wxss**/
+
+/* 主题变量 - 浅色主题（默认） */
+page {
+  /* 背景颜色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: rgba(255, 255, 255, 0.95);
+  --bg-tertiary: rgba(0, 0, 0, 0.03);
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --bg-gradient-dark: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  
+  /* 文字颜色 */
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-light: rgba(255, 255, 255, 0.9);
+  --text-dark: rgba(0, 0, 0, 0.5);
+  
+  /* 边框颜色 */
+  --border-primary: rgba(255, 255, 255, 0.2);
+  --border-secondary: rgba(0, 0, 0, 0.05);
+  --border-tertiary: rgba(0, 0, 0, 0.08);
+  
+  /* 阴影颜色 */
+  --shadow-primary: rgba(0, 0, 0, 0.05);
+  --shadow-secondary: rgba(0, 0, 0, 0.08);
+  --shadow-tertiary: rgba(102, 126, 234, 0.3);
+  
+  /* 强调色 */
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --accent-danger: #ff3b30;
+  
+  /* 消息气泡 */
+  --message-user-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --message-ai-bg: rgba(255, 255, 255, 0.95);
+  --message-ai-text: #333333;
+  
+  /* 输入框 */
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-border: rgba(0, 0, 0, 0.05);
+  --input-text: #333333;
+  --input-placeholder: #999999;
+  
+  /* 代码块 */
+  --code-bg: #f6f8fa;
+  --code-border: #e1e4e8;
+  --code-text: #d73a49;
+  --inline-code-bg: #f1f3f4;
+  
+  /* 表格 */
+  --table-header-bg: #f6f8fa;
+  --table-border: #e1e4e8;
+  --table-row-bg: #f8f9fa;
+  
+  /* 引用块 */
+  --blockquote-bg: rgba(102, 126, 234, 0.05);
+  --blockquote-border: #667eea;
+  --blockquote-text: #586069;
+}
+
+/* 夜间模式变量 */
+page[data-theme="dark"] {
+  /* 背景颜色 */
+  --bg-primary: #1a1a1a;
+  --bg-secondary: rgba(30, 30, 30, 0.95);
+  --bg-tertiary: rgba(255, 255, 255, 0.05);
+  --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  --bg-gradient-dark: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+  
+  /* 文字颜色 */
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+  --text-light: rgba(255, 255, 255, 0.9);
+  --text-dark: rgba(255, 255, 255, 0.5);
+  
+  /* 边框颜色 */
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --border-tertiary: rgba(255, 255, 255, 0.08);
+  
+  /* 阴影颜色 */
+  --shadow-primary: rgba(0, 0, 0, 0.3);
+  --shadow-secondary: rgba(0, 0, 0, 0.4);
+  --shadow-tertiary: rgba(102, 126, 234, 0.4);
+  
+  /* 强调色 */
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --accent-danger: #ff6b6b;
+  
+  /* 消息气泡 */
+  --message-user-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --message-ai-bg: rgba(40, 40, 40, 0.95);
+  --message-ai-text: #ffffff;
+  
+  /* 输入框 */
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #ffffff;
+  --input-placeholder: #666666;
+  
+  /* 代码块 */
+  --code-bg: #2d3748;
+  --code-border: #4a5568;
+  --code-text: #f56565;
+  --inline-code-bg: #2d3748;
+  
+  /* 表格 */
+  --table-header-bg: #2d3748;
+  --table-border: #4a5568;
+  --table-row-bg: #1a202c;
+  
+  /* 引用块 */
+  --blockquote-bg: rgba(102, 126, 234, 0.1);
+  --blockquote-border: #667eea;
+  --blockquote-text: #a0aec0;
+}
+
 .container {
   height: 100%;
   display: flex;
@@ -7,4 +126,6 @@
   justify-content: space-between;
   padding: 200rpx 0;
   box-sizing: border-box;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 } 

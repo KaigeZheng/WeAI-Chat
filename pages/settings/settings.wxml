@@ -1,4 +1,4 @@
-<view class="settings-container">
+<view class="settings-container {{themeClass}}" data-theme="{{pageTheme}}">
   <!-- 安全区域适配 -->
   <view class="safe-area-top"></view>
   
@@ -99,6 +99,21 @@
       <!-- 聊天设置区域 -->
       <view class="settings-section">
         <view class="section-title">聊天设置</view>
+        
+        <!-- 夜间模式 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">夜间模式</text>
+            <text class="label-desc">启用深色主题，保护眼睛</text>
+          </view>
+          <view class="setting-switch">
+            <switch 
+              checked="{{isDarkMode}}" 
+              bindchange="onDarkModeChange"
+              color="#667eea"
+            />
+          </view>
+        </view>
         
         <!-- 消息历史 -->
         <view class="setting-item">

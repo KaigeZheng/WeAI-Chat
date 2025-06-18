@@ -1,7 +1,85 @@
+/* 浅色主题类 */
+.theme-light {
+  --bg-primary: #ffffff;
+  --bg-secondary: rgba(255, 255, 255, 0.95);
+  --bg-tertiary: rgba(0, 0, 0, 0.03);
+  --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --text-tertiary: #999999;
+  --text-light: rgba(255, 255, 255, 0.9);
+  --text-dark: rgba(0, 0, 0, 0.5);
+  --border-primary: rgba(255, 255, 255, 0.2);
+  --border-secondary: rgba(0, 0, 0, 0.05);
+  --border-tertiary: rgba(0, 0, 0, 0.08);
+  --shadow-primary: rgba(0, 0, 0, 0.05);
+  --shadow-secondary: rgba(0, 0, 0, 0.08);
+  --shadow-tertiary: rgba(102, 126, 234, 0.3);
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --accent-danger: #ff3b30;
+  --message-user-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --message-ai-bg: rgba(255, 255, 255, 0.95);
+  --message-ai-text: #333333;
+  --input-bg: rgba(0, 0, 0, 0.03);
+  --input-border: rgba(0, 0, 0, 0.05);
+  --input-text: #333333;
+  --input-placeholder: #999999;
+  --code-bg: #f6f8fa;
+  --code-border: #e1e4e8;
+  --code-text: #d73a49;
+  --inline-code-bg: #f1f3f4;
+  --table-header-bg: #f6f8fa;
+  --table-border: #e1e4e8;
+  --table-row-bg: #f8f9fa;
+  --blockquote-bg: rgba(102, 126, 234, 0.05);
+  --blockquote-border: #667eea;
+  --blockquote-text: #586069;
+}
+
+/* 深色主题类 */
+.theme-dark {
+  --bg-primary: #1a1a1a;
+  --bg-secondary: rgba(30, 30, 30, 0.95);
+  --bg-tertiary: rgba(255, 255, 255, 0.05);
+  --bg-gradient: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  --text-primary: #ffffff;
+  --text-secondary: #cccccc;
+  --text-tertiary: #999999;
+  --text-light: rgba(255, 255, 255, 0.9);
+  --text-dark: rgba(255, 255, 255, 0.5);
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.05);
+  --border-tertiary: rgba(255, 255, 255, 0.08);
+  --shadow-primary: rgba(0, 0, 0, 0.3);
+  --shadow-secondary: rgba(0, 0, 0, 0.4);
+  --shadow-tertiary: rgba(102, 126, 234, 0.4);
+  --accent-primary: #667eea;
+  --accent-secondary: #764ba2;
+  --accent-danger: #ff6b6b;
+  --message-user-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --message-ai-bg: rgba(40, 40, 40, 0.95);
+  --message-ai-text: #ffffff;
+  --input-bg: rgba(255, 255, 255, 0.05);
+  --input-border: rgba(255, 255, 255, 0.1);
+  --input-text: #ffffff;
+  --input-placeholder: #666666;
+  --code-bg: #2d3748;
+  --code-border: #4a5568;
+  --code-text: #f56565;
+  --inline-code-bg: #2d3748;
+  --table-header-bg: #2d3748;
+  --table-border: #4a5568;
+  --table-row-bg: #1a202c;
+  --blockquote-bg: rgba(102, 126, 234, 0.1);
+  --blockquote-border: #667eea;
+  --blockquote-text: #a0aec0;
+}
+
 /* 设置容器 */
 .settings-container {
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient);
   display: flex;
   flex-direction: column;
 }
@@ -9,13 +87,13 @@
 /* 安全区域适配 */
 .safe-area-top {
   height: calc(env(safe-area-inset-top) + 60rpx);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient);
   min-height: 80rpx;
 }
 
 .safe-area-bottom {
   height: env(safe-area-inset-bottom);
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--bg-gradient);
 }
 
 /* 滚动容器 */
@@ -27,11 +105,11 @@
 
 /* 顶部导航栏 */
 .header {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-secondary);
   backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--border-primary);
   padding: 20rpx 0;
-  box-shadow: 0 2rpx 20rpx rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2rpx 20rpx var(--shadow-primary);
 }
 
 .header-content {
@@ -63,9 +141,9 @@
   width: 64rpx;
   height: 64rpx;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-tertiary);
+  box-shadow: 0 2rpx 8rpx var(--shadow-primary);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -74,19 +152,19 @@
 
 .back-btn:active {
   transform: scale(0.95);
-  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1rpx 4rpx var(--shadow-secondary);
 }
 
 .back-icon {
   font-size: 32rpx;
-  color: #333;
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .title {
   font-size: 36rpx;
   font-weight: 700;
-  color: #333;
+  color: var(--text-primary);
   letter-spacing: -0.5rpx;
 }
 
@@ -98,21 +176,21 @@
 
 /* 设置区域 */
 .settings-section {
-  background: rgba(255, 255, 255, 0.95);
+  background: var(--bg-secondary);
   backdrop-filter: blur(10px);
   border-radius: 24rpx;
   padding: 30rpx;
   margin-bottom: 30rpx;
-  box-shadow: 0 4rpx 20rpx rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4rpx 20rpx var(--shadow-secondary);
 }
 
 .section-title {
   font-size: 32rpx;
   font-weight: 600;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 30rpx;
   padding-bottom: 20rpx;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 /* 设置项 */
@@ -121,7 +199,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 24rpx 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 .setting-item:last-child {
@@ -136,14 +214,14 @@
 .label-text {
   display: block;
   font-size: 28rpx;
-  color: #333;
+  color: var(--text-primary);
   margin-bottom: 8rpx;
 }
 
 .label-desc {
   display: block;
   font-size: 24rpx;
-  color: #666;
+  color: var(--text-secondary);
   line-height: 1.4;
 }
 
@@ -157,15 +235,15 @@
   position: relative;
   display: flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--input-bg);
   border-radius: 12rpx;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--input-border);
   overflow: hidden;
   transition: all 0.2s ease;
 }
 
 .input-wrapper:focus-within {
-  border-color: #667eea;
+  border-color: var(--accent-primary);
   box-shadow: 0 0 0 2rpx rgba(102, 126, 234, 0.1);
 }
 
@@ -175,13 +253,13 @@
   border-radius: 12rpx;
   padding: 16rpx 20rpx;
   font-size: 26rpx;
-  color: #333;
+  color: var(--input-text);
   border: none;
   outline: none;
 }
 
 .api-input::placeholder {
-  color: #999;
+  color: var(--input-placeholder);
 }
 
 .eye-btn {
@@ -197,14 +275,12 @@
 }
 
 .eye-btn:active {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 8rpx;
-  transform: scale(0.9);
+  background: var(--bg-tertiary);
 }
 
 .eye-icon {
   font-size: 28rpx;
-  color: #999;
+  color: var(--text-tertiary);
   opacity: 0.8;
 }
 
@@ -215,13 +291,13 @@
 }
 
 .picker-text {
-  background: rgba(0, 0, 0, 0.05);
+  background: var(--bg-tertiary);
   border-radius: 12rpx;
   padding: 16rpx 20rpx;
   font-size: 26rpx;
-  color: #333;
+  color: var(--text-primary);
   text-align: center;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-secondary);
 }
 
 /* 开关 */
@@ -236,7 +312,7 @@
 
 .clear-btn {
   background: rgba(255, 59, 48, 0.1);
-  color: #ff3b30;
+  color: var(--accent-danger);
   border: 1px solid rgba(255, 59, 48, 0.2);
   border-radius: 12rpx;
   padding: 12rpx 24rpx;
@@ -257,20 +333,20 @@
 }
 
 .save-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--message-user-bg);
   color: white;
   border: none;
   border-radius: 16rpx;
   padding: 24rpx;
   font-size: 32rpx;
   font-weight: 600;
-  box-shadow: 0 4rpx 20rpx rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4rpx 20rpx var(--shadow-tertiary);
   transition: all 0.3s ease;
 }
 
 .save-btn:active {
   transform: scale(0.98);
-  box-shadow: 0 2rpx 10rpx rgba(102, 126, 234, 0.4);
+  box-shadow: 0 2rpx 10rpx var(--shadow-tertiary);
 }
 
 .test-btn {
@@ -337,7 +413,7 @@
 
 .version-text {
   background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  color: var(--accent-primary);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 12rpx;
   padding: 12rpx 24rpx;

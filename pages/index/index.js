@@ -8,12 +8,14 @@ Page({
     isLoading: false,
     scrollToMessage: '',
     messageId: 0,
-    currentService: 'openai', // 当前使用的AI服务
+    currentService: 'deepseek', // 当前使用的AI服务
     userInfo: {
       avatarUrl: '',
       nickName: '',
       gender: 0
-    }
+    },
+    isDarkMode: false, // 添加夜间模式状态
+    forceUpdate: 0
   },
 
   onLoad: function (options) {
@@ -31,11 +33,17 @@ Page({
     
     // 检查API Key是否已配置
     this.checkAPIKey();
+    
+    // 初始化主题
+    this.initTheme();
   },
 
   onShow: function() {
     // 每次页面显示时重新加载用户信息
     this.getUserProfile();
+    
+    // 更新主题状态
+    this.updateThemeFromGlobal();
   },
 
   onUnload: function() {
@@ -44,6 +52,51 @@ Page({
       clearTimeout(this.updateTimer);
       this.updateTimer = null;
     }
+  },
+
+  // 初始化主题
+  initTheme() {
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    this.setData({ isDarkMode });
+    this.updatePageTheme(isDarkMode);
+  },
+
+  // 从全局更新主题
+  updateThemeFromGlobal() {
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    if (this.data.isDarkMode !== isDarkMode) {
+      this.setData({ isDarkMode });
+      this.updatePageTheme(isDarkMode);
+    }
+  },
+
+  // 更新页面主题
+  updatePageTheme(isDarkMode) {
+    // 设置页面主题属性
+    wx.setPageStyle({
+      style: {
+        backgroundColor: isDarkMode ? '#1a1a1a' : '#ffffff'
+      }
+    });
+    
+    // 设置页面data-theme属性和主题类名
+    this.setData({
+      pageTheme: isDarkMode ? 'dark' : 'light',
+      themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+    });
+    
+    // 强制重新渲染页面以应用CSS变量
+    this.setData({
+      forceUpdate: Date.now()
+    });
+  },
+
+  // 主题更新方法（供全局调用）
+  updateTheme(isDarkMode) {
+    this.setData({ isDarkMode });
+    this.updatePageTheme(isDarkMode);
   },
 
   // 加载用户设置

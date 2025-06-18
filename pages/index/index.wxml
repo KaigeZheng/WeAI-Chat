@@ -1,5 +1,5 @@
 <!--index.wxml-->
-<view class="chat-container">
+<view class="chat-container {{themeClass}}" data-theme="{{pageTheme}}">
   <!-- 安全区域适配 -->
   <view class="safe-area-top"></view>
   

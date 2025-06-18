@@ -11,11 +11,20 @@ Page({
     showDeepSeekKey: false,
     temperature: 0.7,
     maxTokens: 1024,
-    appVersion: '1.0.0'
+    appVersion: '1.0.0',
+    isDarkMode: false,
+    pageTheme: 'light',
+    themeClass: 'theme-light'
   },
 
   onLoad() {
     this.loadSettings();
+    this.initTheme();
+  },
+
+  onShow() {
+    // 更新主题状态
+    this.updateThemeFromGlobal();
   },
 
   // 加载设置
@@ -35,6 +44,10 @@ Page({
     // 加载版本号
     const appVersion = wx.getStorageSync('app_version') || '1.0.0';
     
+    // 加载夜间模式设置
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    
     this.setData({
       dashScopeKey: dashScopeKey || '',
       deepseekKey: deepseekKey || '',
@@ -42,7 +55,56 @@ Page({
       defaultServiceIndex,
       temperature,
       maxTokens,
-      appVersion
+      appVersion,
+      isDarkMode
+    });
+  },
+
+  // 初始化主题
+  initTheme() {
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    this.setData({ 
+      isDarkMode,
+      pageTheme: isDarkMode ? 'dark' : 'light',
+      themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+    });
+  },
+
+  // 从全局更新主题
+  updateThemeFromGlobal() {
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    if (this.data.isDarkMode !== isDarkMode) {
+      this.setData({ 
+        isDarkMode,
+        pageTheme: isDarkMode ? 'dark' : 'light',
+        themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+      });
+    }
+  },
+
+  // 主题更新方法（供全局调用）
+  updateTheme(isDarkMode) {
+    this.setData({ 
+      isDarkMode,
+      pageTheme: isDarkMode ? 'dark' : 'light',
+      themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+    });
+  },
+
+  // 夜间模式切换
+  onDarkModeChange(e) {
+    const isDarkMode = e.detail.value;
+    this.setData({ isDarkMode });
+    
+    // 调用全局的夜间模式切换方法
+    const app = getApp();
+    app.toggleDarkMode();
+    
+    wx.showToast({
+      title: isDarkMode ? '已启用夜间模式' : '已关闭夜间模式',
+      icon: 'success'
     });
   },
 
