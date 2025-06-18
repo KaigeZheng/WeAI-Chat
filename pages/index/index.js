@@ -802,11 +802,11 @@ Page({
       model: this.data.currentService,
       modelId: this.data.currentService
     };
-    
+
     this.setData({
       messages: [...this.data.messages, testMessage]
     });
-    
+
     this.saveMessages();
     this.scrollToBottom();
   },

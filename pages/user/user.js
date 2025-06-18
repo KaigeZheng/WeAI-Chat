@@ -8,6 +8,8 @@ Page({
       hobbies: [],
       aiStyle: 0
     },
+    selectedHobbies: [], // 独立的选中状态数组
+    hobbySelected: [false, false, false, false, false, false, false, false, false, false], // 布尔值数组
     genderOptions: ['未知', '男', '女'],
     professionOptions: ['学生', '程序员', '设计师', '教师', '医生', '销售', '管理', '其他'],
     hobbyOptions: [
@@ -75,7 +77,9 @@ Page({
 
   // 加载用户信息
   loadUserInfo: function() {
-    const userInfo = wx.getStorageSync('userInfo') || {
+    const storedUserInfo = wx.getStorageSync('userInfo');
+    
+    let userInfo = storedUserInfo || {
       avatarUrl: '',
       nickName: '',
       gender: 0,
@@ -83,8 +87,25 @@ Page({
       hobbies: [],
       aiStyle: 0
     };
+    
+    // 确保hobbies是数组
+    if (!Array.isArray(userInfo.hobbies)) {
+      userInfo.hobbies = [];
+    }
+    
+    // 初始化布尔值数组
+    const hobbySelected = [false, false, false, false, false, false, false, false, false, false];
+    userInfo.hobbies.forEach(hobby => {
+      const index = this.data.hobbyOptions.findIndex(option => option.key === hobby);
+      if (index >= 0) {
+        hobbySelected[index] = true;
+      }
+    });
+    
     this.setData({
-      userInfo: userInfo
+      userInfo: userInfo,
+      selectedHobbies: [...userInfo.hobbies],
+      hobbySelected: hobbySelected
     });
   },
 
@@ -139,19 +160,29 @@ Page({
   // 切换兴趣爱好
   toggleHobby: function(e) {
     const hobbyKey = e.currentTarget.dataset.hobby;
-    const hobbies = [...this.data.userInfo.hobbies];
+    const index = this.data.hobbyOptions.findIndex(option => option.key === hobbyKey);
     
-    if (hobbies.includes(hobbyKey)) {
-      // 移除兴趣爱好
-      const index = hobbies.indexOf(hobbyKey);
-      hobbies.splice(index, 1);
-    } else {
-      // 添加兴趣爱好（不限制数量）
-      hobbies.push(hobbyKey);
+    if (index === -1) {
+      return;
     }
     
+    // 复制布尔值数组
+    const hobbySelected = [...this.data.hobbySelected];
+    hobbySelected[index] = !hobbySelected[index];
+    
+    // 更新selectedHobbies数组
+    const selectedHobbies = [];
+    hobbySelected.forEach((selected, i) => {
+      if (selected) {
+        selectedHobbies.push(this.data.hobbyOptions[i].key);
+      }
+    });
+    
+    // 更新数据
     this.setData({
-      'userInfo.hobbies': hobbies
+      hobbySelected: hobbySelected,
+      selectedHobbies: selectedHobbies,
+      'userInfo.hobbies': selectedHobbies
     });
   },
 
