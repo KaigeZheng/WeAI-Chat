@@ -71,6 +71,18 @@
               <view class="streaming-dot"></view>
             </view>
           </view>
+          
+          <!-- AI消息的复制按钮 -->
+          <view wx:if="{{item.role === 'assistant' && item.content && !item.isStreaming}}" class="copy-actions">
+            <view class="copy-btn" data-type="text" data-content="{{item.content}}" bindtap="copyMessage">
+              <text class="copy-icon">📋</text>
+              <text class="copy-text">复制文本</text>
+            </view>
+            <view class="copy-btn" data-type="markdown" data-content="{{item.content}}" bindtap="copyMessage">
+              <text class="copy-icon">📝</text>
+              <text class="copy-text">复制Markdown</text>
+            </view>
+          </view>
         </view>
       </view>
     </view>
@@ -120,7 +132,7 @@
         hold-keyboard="false"
         disable-default-padding="true"
       ></textarea>
-      <view class="send-btn {{canSend ? 'active' : ''}}" bindtap="sendMessage">
+      <view class="send-btn {{hasInputContent ? 'active' : ''}}" bindtap="sendMessage">
         <text class="send-icon">发送</text>
       </view>
     </view>

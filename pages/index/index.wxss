@@ -367,11 +367,18 @@ page {
   border: 1px solid rgba(102, 126, 234, 0.2);
 }
 
+.message-bubble {
+  background: var(--message-ai-bg);
+  border-radius: 20rpx;
+  padding: 24rpx;
+  box-shadow: 0 2rpx 12rpx var(--shadow-primary);
+  position: relative;
+  overflow: hidden;
+}
+
 .user-message .message-bubble {
   background: var(--message-user-bg);
   color: white;
-  box-shadow: 0 4rpx 20rpx var(--shadow-tertiary);
-  border: 1px solid var(--border-primary);
 }
 
 .ai-message .message-bubble {
@@ -804,15 +811,15 @@ page {
 }
 
 .send-btn {
-  background: #cccccc;
-  color: #fff;
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
   padding: 12rpx 24rpx;
   border-radius: 24rpx;
   font-size: 28rpx;
   font-weight: 600;
   transition: all 0.3s ease;
   flex-shrink: 0;
-  box-shadow: 0 4rpx 16rpx var(--shadow-tertiary);
+  box-shadow: 0 2rpx 8rpx var(--shadow-primary);
   position: relative;
   overflow: hidden;
 }
@@ -834,16 +841,10 @@ page {
 }
 
 .send-btn.active {
-  background: #1677ff;
-  color: #fff;
+  background: var(--message-user-bg);
+  color: white;
   transform: scale(1.02);
   box-shadow: 0 6rpx 20rpx var(--shadow-tertiary);
-}
-
-.send-btn:not(.active) {
-  background: var(--bg-tertiary);
-  color: var(--text-tertiary);
-  box-shadow: 0 2rpx 8rpx var(--shadow-primary);
 }
 
 .send-icon {
@@ -969,4 +970,55 @@ page {
   min-height: 44rpx;
   display: inline-flex;
   align-items: center;
+}
+
+/* 复制按钮区域 */
+.copy-actions {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 16rpx;
+  padding: 0 8rpx;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 12rpx 16rpx;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-tertiary);
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4rpx 12rpx var(--shadow-secondary);
+  min-width: 120rpx;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.copy-btn:hover {
+  background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  box-shadow: 0 6rpx 16rpx var(--shadow-secondary);
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+  background: var(--accent-primary);
+  color: white;
+  border-color: var(--accent-primary);
+  box-shadow: 0 2rpx 8rpx var(--shadow-tertiary);
+}
+
+.copy-icon {
+  font-size: 28rpx;
+  line-height: 1;
+}
+
+.copy-text {
+  font-size: 24rpx;
+  font-weight: 500;
+  white-space: nowrap;
 }
