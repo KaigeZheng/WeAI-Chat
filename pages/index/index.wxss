@@ -336,6 +336,37 @@ page {
   max-width: 70%;
 }
 
+/* 消息头部样式 */
+.message-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8rpx;
+  padding: 0 4rpx;
+}
+
+.message-id {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 4rpx 12rpx;
+  border-radius: 12rpx;
+  border: 1px solid var(--border-secondary);
+}
+
+.user-message .message-id {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ai-message .message-id {
+  color: var(--accent-primary);
+  background: rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
 .message-bubble {
   background: var(--message-ai-bg);
   backdrop-filter: blur(10px);

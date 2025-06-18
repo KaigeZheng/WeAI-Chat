@@ -57,6 +57,10 @@
           </view>
         </view>
         <view class="message-content">
+          <view class="message-header">
+            <text class="message-id">{{item.role === 'user' ? item.userId : (item.model === 'qwen' ? 'Qwen-Plus' : 'DeepSeek')}}</text>
+            <text class="message-time">{{item.time}}</text>
+          </view>
           <view class="message-bubble">
             <wemark wx:if="{{item.role === 'assistant' && item.content}}" md="{{item.content}}" link highlight wx:key="content"></wemark>
             <text wx:if="{{item.role === 'assistant' && !item.content}}" class="message-text">正在思考中...</text>
@@ -67,7 +71,6 @@
               <view class="streaming-dot"></view>
             </view>
           </view>
-          <view class="message-time">{{item.time}}</view>
         </view>
       </view>
     </view>

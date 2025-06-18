@@ -5,12 +5,55 @@ Page({
       nickName: '',
       gender: 0
     },
-    genderOptions: ['未知', '男', '女']
+    genderOptions: ['未知', '男', '女'],
+    isDarkMode: false,
+    pageTheme: 'light',
+    themeClass: 'theme-light'
   },
 
   onLoad: function (options) {
     // 加载用户信息
     this.loadUserInfo();
+    // 初始化主题
+    this.initTheme();
+  },
+
+  onShow() {
+    // 更新主题状态
+    this.updateThemeFromGlobal();
+  },
+
+  // 初始化主题
+  initTheme() {
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    this.setData({ 
+      isDarkMode,
+      pageTheme: isDarkMode ? 'dark' : 'light',
+      themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+    });
+  },
+
+  // 从全局更新主题
+  updateThemeFromGlobal() {
+    const app = getApp();
+    const isDarkMode = app.globalData.isDarkMode;
+    if (this.data.isDarkMode !== isDarkMode) {
+      this.setData({ 
+        isDarkMode,
+        pageTheme: isDarkMode ? 'dark' : 'light',
+        themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+      });
+    }
+  },
+
+  // 主题更新方法（供全局调用）
+  updateTheme(isDarkMode) {
+    this.setData({ 
+      isDarkMode,
+      pageTheme: isDarkMode ? 'dark' : 'light',
+      themeClass: isDarkMode ? 'theme-dark' : 'theme-light'
+    });
   },
 
   // 加载用户信息

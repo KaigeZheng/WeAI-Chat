@@ -300,6 +300,49 @@
   border: 1px solid var(--border-secondary);
 }
 
+/* 值显示 */
+.setting-value {
+  flex: 1;
+  max-width: 300rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.user-id-text {
+  background: var(--bg-tertiary);
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
+  color: var(--accent-primary);
+  font-weight: 600;
+  border: 1px solid var(--border-secondary);
+  flex: 1;
+  text-align: center;
+}
+
+.copy-btn {
+  width: 48rpx;
+  height: 48rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-primary);
+  border-radius: 12rpx;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.copy-btn:active {
+  transform: scale(0.95);
+  background: var(--accent-secondary);
+}
+
+.copy-icon {
+  font-size: 24rpx;
+  color: white;
+}
+
 /* 开关 */
 .setting-switch {
   flex-shrink: 0;

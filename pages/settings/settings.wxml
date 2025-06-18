@@ -145,6 +145,20 @@
           </view>
         </view>
 
+        <!-- 用户ID显示 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">用户ID</text>
+            <text class="label-desc">您的唯一标识符，用于消息显示</text>
+          </view>
+          <view class="setting-value">
+            <text class="user-id-text">{{userInfo.userId}}</text>
+            <view class="copy-btn" bindtap="copyUserId">
+              <text class="copy-icon">📋</text>
+            </view>
+          </view>
+        </view>
+
         <!-- 清空聊天记录 -->
         <view class="setting-item">
           <view class="setting-label">

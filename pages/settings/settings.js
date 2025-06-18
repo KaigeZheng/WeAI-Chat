@@ -15,7 +15,10 @@ Page({
     appVersion: '1.0.0',
     isDarkMode: false,
     pageTheme: 'light',
-    themeClass: 'theme-light'
+    themeClass: 'theme-light',
+    userInfo: {
+      userId: ''
+    }
   },
 
   onLoad() {
@@ -50,6 +53,9 @@ Page({
     const app = getApp();
     const isDarkMode = app.globalData.isDarkMode;
     
+    // 加载用户信息
+    const userInfo = wx.getStorageSync('userInfo') || { userId: '' };
+    
     this.setData({
       dashScopeKey: dashScopeKey || '',
       deepseekKey: deepseekKey || '',
@@ -59,7 +65,8 @@ Page({
       temperature,
       maxTokens,
       appVersion,
-      isDarkMode
+      isDarkMode,
+      userInfo
     });
   },
 
@@ -337,39 +344,48 @@ SOFTWARE.`;
 
   // 保存设置
   saveSettings() {
-    try {
-      // 保存API Keys
-      if (this.data.dashScopeKey.trim()) {
-        setAPIKey('qwen', this.data.dashScopeKey.trim());
-      }
-      if (this.data.deepseekKey.trim()) {
-        setAPIKey('deepseek', this.data.deepseekKey.trim());
-      }
+    // 保存API Keys
+    setAPIKey('qwen', this.data.dashScopeKey);
+    setAPIKey('deepseek', this.data.deepseekKey);
+    
+    // 保存其他设置
+    wx.setStorageSync('save_history', this.data.saveHistory);
+    wx.setStorageSync('enable_context', this.data.enableContext);
+    wx.setStorageSync('default_service', this.data.defaultServiceIndex);
+    
+    // 保存高级设置
+    wx.setStorageSync('temperature', this.data.temperature);
+    wx.setStorageSync('maxTokens', this.data.maxTokens);
+    
+    wx.showToast({
+      title: '设置已保存',
+      icon: 'success'
+    });
+  },
 
-      // 保存其他设置
-      wx.setStorageSync('save_history', this.data.saveHistory);
-      wx.setStorageSync('enable_context', this.data.enableContext);
-      wx.setStorageSync('default_service', this.data.defaultServiceIndex);
-
-      // 保存高级设置
-      wx.setStorageSync('temperature', this.data.temperature);
-      wx.setStorageSync('maxTokens', this.data.maxTokens);
-
-      wx.showToast({
-        title: '设置已保存',
-        icon: 'success'
+  // 复制用户ID
+  copyUserId() {
+    const userId = this.data.userInfo.userId;
+    if (userId) {
+      wx.setClipboardData({
+        data: userId,
+        success: () => {
+          wx.showToast({
+            title: '用户ID已复制',
+            icon: 'success'
+          });
+        },
+        fail: () => {
+          wx.showToast({
+            title: '复制失败',
+            icon: 'none'
+          });
+        }
       });
-
-      // 返回上一页
-      setTimeout(() => {
-        wx.navigateBack();
-      }, 1500);
-
-    } catch (error) {
-      console.error('保存设置失败:', error);
+    } else {
       wx.showToast({
-        title: '保存失败',
-        icon: 'error'
+        title: '用户ID不存在',
+        icon: 'none'
       });
     }
   }

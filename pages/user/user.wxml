@@ -1,4 +1,4 @@
-<view class="container">
+<view class="container {{themeClass}}" data-theme="{{pageTheme}}">
   <view class="header">
     <text class="title">个人设置</text>
   </view>

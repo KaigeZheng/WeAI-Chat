@@ -12,7 +12,8 @@ Page({
     userInfo: {
       avatarUrl: '',
       nickName: '',
-      gender: 0
+      gender: 0,
+      userId: '' // 添加用户ID字段
     },
     isDarkMode: false, // 添加夜间模式状态
     forceUpdate: 0
@@ -36,6 +37,9 @@ Page({
     
     // 初始化主题
     this.initTheme();
+    
+    // 处理历史消息，确保有用户ID和模型ID
+    this.loadMessages();
   },
 
   onShow: function() {
@@ -152,11 +156,24 @@ Page({
     
     // 为历史消息添加默认模型信息（兼容旧版本）
     const processedMessages = messages.map(msg => {
+      let processedMsg = { ...msg };
+      
       if (msg.role === 'assistant' && !msg.model) {
         // 对于没有model字段的旧AI消息，默认设置为qwen
-        return { ...msg, model: 'qwen' };
+        processedMsg.model = 'qwen';
       }
-      return msg;
+      
+      if (msg.role === 'user' && !msg.userId) {
+        // 对于没有userId字段的旧用户消息，使用当前用户ID
+        processedMsg.userId = this.data.userInfo.userId || this.generateUserId();
+      }
+      
+      if (msg.role === 'assistant' && !msg.modelId) {
+        // 对于没有modelId字段的旧AI消息，使用model字段
+        processedMsg.modelId = msg.model || 'qwen';
+      }
+      
+      return processedMsg;
     });
     
     this.setData({ messages: processedMessages });
@@ -204,7 +221,8 @@ Page({
       id: ++this.data.messageId,
       role: 'user',
       content: message,
-      time: this.formatTime(new Date())
+      time: this.formatTime(new Date()),
+      userId: this.data.userInfo.userId
     };
 
     // 添加AI消息占位符
@@ -214,7 +232,8 @@ Page({
       content: '',
       time: this.formatTime(new Date()),
       model: currentService,
-      isStreaming: true
+      isStreaming: true,
+      modelId: this.data.currentService
     };
 
     this.setData({
@@ -316,7 +335,8 @@ Page({
         role: 'assistant',
         content: response,
         time: this.formatTime(new Date()),
-        model: currentService // 记录生成该消息的模型
+        model: currentService, // 记录生成该消息的模型
+        modelId: this.data.currentService
       };
 
       this.setData({
@@ -339,7 +359,8 @@ Page({
         role: 'assistant',
         content: `抱歉，我遇到了一些问题：${error.message || '请检查网络连接和API配置'}`,
         time: this.formatTime(new Date()),
-        model: currentService // 记录生成该消息的模型
+        model: currentService, // 记录生成该消息的模型
+        modelId: this.data.currentService
       };
 
       this.setData({
@@ -420,51 +441,37 @@ Page({
       return;
     }
 
-    wx.showLoading({
-      title: '测试API连接...'
-    });
-
-    // 创建测试消息
-    const testMessage = {
+    // 添加测试用户消息
+    const testUserMessage = {
       id: ++this.data.messageId,
       role: 'user',
       content: '你好，请简单回复一下测试消息。',
-      time: this.formatTime(new Date())
+      time: this.formatTime(new Date()),
+      userId: this.data.userInfo.userId
     };
 
+    // 添加测试AI消息
     const testAiMessage = {
       id: ++this.data.messageId,
       role: 'assistant',
-      content: '',
+      content: '你好！我是WeAI Chat，这是一个测试回复。我可以帮助你回答各种问题，包括编程、学习、工作等方面的问题。',
       time: this.formatTime(new Date()),
       model: currentService,
-      isStreaming: true
+      isStreaming: false,
+      modelId: this.data.currentService
     };
 
     this.setData({
-      messages: [...this.data.messages, testMessage, testAiMessage]
+      messages: [...this.data.messages, testUserMessage, testAiMessage],
+      scrollToMessage: `msg-${testAiMessage.id}`
     });
 
-    // 构建包含上下文的完整prompt
-    const contextPrompt = this.buildContextPrompt('你好，请简单回复一下测试消息。');
-
-    // 使用流式API进行测试
-    this.requestAIResponseStream(contextPrompt, testAiMessage.id)
-      .then(() => {
-        wx.hideLoading();
-        wx.showToast({
-          title: 'API连接成功',
-          icon: 'success'
-        });
-      })
-      .catch((error) => {
-        wx.hideLoading();
-        wx.showModal({
-          title: 'API测试失败',
-          content: `错误信息：${error.message}`,
-          showCancel: false
-        });
-      });
+    this.saveMessages();
+    
+    wx.showToast({
+      title: '测试消息已添加',
+      icon: 'success'
+    });
   },
 
   // 请求AI响应（流式）
@@ -588,10 +595,34 @@ Page({
   getUserProfile: function() {
     const userInfo = wx.getStorageSync('userInfo');
     if (userInfo) {
+      // 如果用户信息中没有userId，则生成一个
+      if (!userInfo.userId) {
+        userInfo.userId = this.generateUserId();
+        wx.setStorageSync('userInfo', userInfo);
+      }
       this.setData({
         userInfo: userInfo
       });
+    } else {
+      // 如果没有用户信息，创建一个默认的用户信息
+      const defaultUserInfo = {
+        avatarUrl: '',
+        nickName: '用户',
+        gender: 0,
+        userId: this.generateUserId()
+      };
+      wx.setStorageSync('userInfo', defaultUserInfo);
+      this.setData({
+        userInfo: defaultUserInfo
+      });
     }
+  },
+
+  // 生成用户ID
+  generateUserId: function() {
+    // 生成一个简单的用户ID，格式：U + 6位随机数字
+    const randomNum = Math.floor(Math.random() * 900000) + 100000;
+    return `U${randomNum}`;
   },
 
   // 点击用户头像
@@ -614,7 +645,8 @@ Page({
       id: ++this.data.messageId,
       role: 'user',
       content: '请测试markdown渲染功能',
-      time: this.formatTime(new Date())
+      time: this.formatTime(new Date()),
+      userId: this.data.userInfo.userId
     };
 
     const testAiMessage = {
@@ -658,7 +690,8 @@ function hello() {
 这里有一些 \`行内代码\` 示例。`,
       time: this.formatTime(new Date()),
       model: this.data.currentService,
-      isStreaming: false
+      isStreaming: false,
+      modelId: this.data.currentService
     };
 
     this.setData({
