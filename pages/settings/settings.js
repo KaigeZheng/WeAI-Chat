@@ -7,6 +7,7 @@ Page({
     defaultServiceIndex: 0,
     serviceOptions: ['Qwen-Plus', 'DeepSeek'],
     saveHistory: true,
+    enableContext: true,
     showDashScopeKey: false,
     showDeepSeekKey: false,
     temperature: 0.7,
@@ -35,6 +36,7 @@ Page({
     
     // 加载其他设置
     const saveHistory = wx.getStorageSync('save_history') !== false; // 默认开启
+    const enableContext = wx.getStorageSync('enable_context') !== false; // 默认开启上下文
     const defaultServiceIndex = wx.getStorageSync('default_service') || 0;
     
     // 加载高级设置
@@ -52,6 +54,7 @@ Page({
       dashScopeKey: dashScopeKey || '',
       deepseekKey: deepseekKey || '',
       saveHistory,
+      enableContext,
       defaultServiceIndex,
       temperature,
       maxTokens,
@@ -156,6 +159,13 @@ Page({
   onSaveHistoryChange(e) {
     this.setData({
       saveHistory: e.detail.value
+    });
+  },
+
+  // 上下文对话变化
+  onEnableContextChange(e) {
+    this.setData({
+      enableContext: e.detail.value
     });
   },
 
@@ -338,6 +348,7 @@ SOFTWARE.`;
 
       // 保存其他设置
       wx.setStorageSync('save_history', this.data.saveHistory);
+      wx.setStorageSync('enable_context', this.data.enableContext);
       wx.setStorageSync('default_service', this.data.defaultServiceIndex);
 
       // 保存高级设置

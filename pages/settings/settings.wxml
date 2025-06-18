@@ -130,6 +130,21 @@
           </view>
         </view>
 
+        <!-- 上下文对话 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">上下文对话</text>
+            <text class="label-desc">AI能记住对话历史，提供更连贯的回复</text>
+          </view>
+          <view class="setting-switch">
+            <switch 
+              checked="{{enableContext}}" 
+              bindchange="onEnableContextChange"
+              color="#667eea"
+            />
+          </view>
+        </view>
+
         <!-- 清空聊天记录 -->
         <view class="setting-item">
           <view class="setting-label">

@@ -39,7 +39,7 @@ const updateAPIConfig = (config, userSettings) => {
 };
 
 // API调用函数
-const callAIAPI = async (message, service = API_CONFIG.defaultService) => {
+const callAIAPI = async (prompt, service = API_CONFIG.defaultService) => {
   const config = API_CONFIG[service];
   
   if (!config.apiKey) {
@@ -55,11 +55,11 @@ const callAIAPI = async (message, service = API_CONFIG.defaultService) => {
     maxTokens: updatedConfig.maxTokens
   });
 
-  return await makeAPIRequest(message, updatedConfig, service);
+  return await makeAPIRequest(prompt, updatedConfig, service);
 };
 
 // 流式API调用函数
-const callAIAPIStream = async (message, service = API_CONFIG.defaultService, onChunk) => {
+const callAIAPIStream = async (prompt, service = API_CONFIG.defaultService, onChunk) => {
   const config = API_CONFIG[service];
   
   if (!config.apiKey) {
@@ -75,23 +75,26 @@ const callAIAPIStream = async (message, service = API_CONFIG.defaultService, onC
     maxTokens: updatedConfig.maxTokens
   });
 
-  return await makeAPIRequestStream(message, updatedConfig, service, onChunk);
+  return await makeAPIRequestStream(prompt, updatedConfig, service, onChunk);
 };
 
 // 发起API请求
-const makeAPIRequest = async (message, config, service) => {
+const makeAPIRequest = async (prompt, config, service) => {
   try {
     console.log(`准备调用${service} API:`, {
       url: `${config.baseURL}/chat/completions`,
       model: config.model,
-      message: message
+      prompt: prompt.substring(0, 200) + '...' // 只显示前200个字符
     });
+
+    // 解析prompt中的对话历史
+    const messages = parsePromptToMessages(prompt);
 
     // 根据服务类型使用不同的API格式
     if (service === 'qwen') {
-      return await callDashScopeAPI(message, config, service);
+      return await callDashScopeAPI(messages, config, service);
     } else {
-      return await callStandardAPI(message, config, service);
+      return await callStandardAPI(messages, config, service);
     }
   } catch (error) {
     console.error(`${service} API调用异常:`, error);
@@ -100,19 +103,22 @@ const makeAPIRequest = async (message, config, service) => {
 };
 
 // 发起API请求（流式）
-const makeAPIRequestStream = async (message, config, service, onChunk) => {
+const makeAPIRequestStream = async (prompt, config, service, onChunk) => {
   try {
     console.log(`准备调用${service}流式API:`, {
       url: `${config.baseURL}/chat/completions`,
       model: config.model,
-      message: message
+      prompt: prompt.substring(0, 200) + '...' // 只显示前200个字符
     });
+
+    // 解析prompt中的对话历史
+    const messages = parsePromptToMessages(prompt);
 
     // 根据服务类型使用不同的API格式
     if (service === 'qwen') {
-      return await callDashScopeAPIStream(message, config, service, onChunk);
+      return await callDashScopeAPIStream(messages, config, service, onChunk);
     } else {
-      return await callStandardAPIStream(message, config, service, onChunk);
+      return await callStandardAPIStream(messages, config, service, onChunk);
     }
   } catch (error) {
     console.error(`${service} API调用异常:`, error);
@@ -120,8 +126,47 @@ const makeAPIRequestStream = async (message, config, service, onChunk) => {
   }
 };
 
+// 解析prompt为消息数组
+const parsePromptToMessages = (prompt) => {
+  const messages = [];
+  const lines = prompt.split('\n');
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    
+    if (line.startsWith('system:')) {
+      const content = line.substring(7).trim();
+      if (content) {
+        messages.push({
+          role: 'system',
+          content: content
+        });
+      }
+    } else if (line.startsWith('user:')) {
+      const content = line.substring(5).trim();
+      if (content) {
+        messages.push({
+          role: 'user',
+          content: content
+        });
+      }
+    } else if (line.startsWith('ai:')) {
+      const content = line.substring(3).trim();
+      if (content) {
+        messages.push({
+          role: 'assistant',
+          content: content
+        });
+      }
+    }
+  }
+  
+  console.log('解析后的消息数组:', messages);
+  return messages;
+};
+
 // 调用阿里百炼API
-const callDashScopeAPI = async (message, config, service) => {
+const callDashScopeAPI = async (messages, config, service) => {
   try {
     const response = await new Promise((resolve, reject) => {
       wx.request({
@@ -134,16 +179,7 @@ const callDashScopeAPI = async (message, config, service) => {
         data: {
           model: config.model,
           input: {
-            messages: [
-              {
-                role: 'system',
-                content: '你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。'
-              },
-              {
-                role: 'user',
-                content: message
-              }
-            ]
+            messages: messages
           },
           parameters: {
             max_tokens: config.maxTokens,
@@ -183,7 +219,7 @@ const callDashScopeAPI = async (message, config, service) => {
 };
 
 // 调用标准OpenAI格式API
-const callStandardAPI = async (message, config, service) => {
+const callStandardAPI = async (messages, config, service) => {
   try {
     const response = await new Promise((resolve, reject) => {
       wx.request({
@@ -195,18 +231,10 @@ const callStandardAPI = async (message, config, service) => {
         },
         data: {
           model: config.model,
-          messages: [
-            {
-              role: 'system',
-              content: '你你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。'
-            },
-            {
-              role: 'user',
-              content: message
-            }
-          ],
+          messages: messages,
           max_tokens: config.maxTokens,
-          temperature: config.temperature
+          temperature: config.temperature,
+          stream: false
         },
         success: (res) => {
           console.log(`${service} API响应成功:`, {
@@ -240,7 +268,7 @@ const callStandardAPI = async (message, config, service) => {
 };
 
 // 调用阿里百炼API（流式）
-const callDashScopeAPIStream = async (message, config, service, onChunk) => {
+const callDashScopeAPIStream = async (messages, config, service, onChunk) => {
   try {
     return new Promise((resolve, reject) => {
       const requestTask = wx.request({
@@ -253,16 +281,7 @@ const callDashScopeAPIStream = async (message, config, service, onChunk) => {
         data: {
           model: config.model,
           input: {
-            messages: [
-              {
-                role: 'system',
-                content: '你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。'
-              },
-              {
-                role: 'user',
-                content: message
-              }
-            ]
+            messages: messages
           },
           parameters: {
             max_tokens: config.maxTokens,
@@ -301,11 +320,11 @@ const callDashScopeAPIStream = async (message, config, service, onChunk) => {
 };
 
 // 调用标准OpenAI格式API（流式）
-const callStandardAPIStream = async (message, config, service, onChunk) => {
+const callStandardAPIStream = async (messages, config, service, onChunk) => {
   try {
     return new Promise((resolve, reject) => {
       const requestTask = wx.request({
-        url: `x`, // ${config.baseURL}/chat/completions
+        url: `${config.baseURL}/chat/completions`,
         method: 'POST',
         header: {
           'Content-Type': 'application/json',
@@ -313,16 +332,7 @@ const callStandardAPIStream = async (message, config, service, onChunk) => {
         },
         data: {
           model: config.model,
-          messages: [
-            {
-              role: 'system',
-              content: '你你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。'
-            },
-            {
-              role: 'user',
-              content: message
-            }
-          ],
+          messages: messages,
           max_tokens: config.maxTokens,
           temperature: config.temperature,
           stream: true // 启用流式输出

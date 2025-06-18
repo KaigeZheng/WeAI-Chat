@@ -207,28 +207,93 @@ Page({
       time: this.formatTime(new Date())
     };
 
-    // 创建AI消息占位符
+    // 添加AI消息占位符
     const aiMessage = {
       id: ++this.data.messageId,
       role: 'assistant',
       content: '',
       time: this.formatTime(new Date()),
       model: currentService,
-      isStreaming: true // 标记为流式输出
+      isStreaming: true
     };
-
-    console.log('创建AI消息:', aiMessage);
 
     this.setData({
       messages: [...this.data.messages, userMessage, aiMessage],
       inputMessage: '',
+      isLoading: true,
       scrollToMessage: `msg-${aiMessage.id}`
     });
 
     this.saveMessages();
 
-    // 调用流式AI API
-    this.requestAIResponseStream(message, aiMessage.id);
+    // 构建包含上下文的完整prompt
+    const contextPrompt = this.buildContextPrompt(message);
+    
+    // 使用流式API调用
+    this.requestAIResponseStream(contextPrompt, aiMessage.id)
+      .then(() => {
+        this.setData({ isLoading: false });
+        this.scrollToBottom();
+      })
+      .catch((error) => {
+        console.error('AI响应失败:', error);
+        this.setData({ isLoading: false });
+        
+        // 更新错误消息
+        const messages = [...this.data.messages];
+        const messageIndex = messages.findIndex(msg => msg.id === aiMessage.id);
+        if (messageIndex !== -1) {
+          messages[messageIndex] = {
+            ...messages[messageIndex],
+            content: `抱歉，我遇到了一些问题：${error.message || '请检查网络连接和API配置'}`,
+            isStreaming: false
+          };
+          this.setData({ messages });
+        }
+        this.saveMessages();
+      });
+  },
+
+  // 构建包含上下文的prompt
+  buildContextPrompt(currentMessage) {
+    // 检查是否启用上下文功能
+    const enableContext = wx.getStorageSync('enable_context') !== false; // 默认开启
+    
+    if (!enableContext) {
+      // 如果不启用上下文，只发送当前消息
+      let simplePrompt = 'system: 你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。\n\n';
+      simplePrompt += `user: ${currentMessage}\n\n`;
+      simplePrompt += 'ai: ';
+      return simplePrompt;
+    }
+    
+    const messages = this.data.messages;
+    const maxContextLength = 10; // 最大上下文消息数量
+    
+    // 获取最近的对话历史（限制数量以避免token超限）
+    const recentMessages = messages.slice(-maxContextLength);
+    
+    // 构建完整的对话上下文
+    let contextPrompt = '';
+    
+    // 添加系统提示词
+    contextPrompt += 'system: 你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。\n\n';
+    
+    // 添加历史对话记录
+    recentMessages.forEach(msg => {
+      if (msg.role === 'user') {
+        contextPrompt += `user: ${msg.content}\n\n`;
+      } else if (msg.role === 'assistant') {
+        contextPrompt += `ai: ${msg.content}\n\n`;
+      }
+    });
+    
+    // 添加当前用户消息
+    contextPrompt += `user: ${currentMessage}\n\n`;
+    contextPrompt += 'ai: ';
+    
+    console.log('构建的上下文prompt:', contextPrompt);
+    return contextPrompt;
   },
 
   // 请求AI响应
@@ -238,7 +303,10 @@ Page({
       console.log(`使用${currentService}服务调用API`);
       console.log(`当前服务配置:`, API_CONFIG[currentService]);
       
-      const response = await callAIAPI(userMessage, currentService);
+      // 构建包含上下文的完整prompt
+      const contextPrompt = this.buildContextPrompt(userMessage);
+      
+      const response = await callAIAPI(contextPrompt, currentService);
       
       console.log(`API调用成功，响应:`, response);
       
@@ -377,8 +445,11 @@ Page({
       messages: [...this.data.messages, testMessage, testAiMessage]
     });
 
+    // 构建包含上下文的完整prompt
+    const contextPrompt = this.buildContextPrompt('你好，请简单回复一下测试消息。');
+
     // 使用流式API进行测试
-    this.requestAIResponseStream('你好，请简单回复一下测试消息。', testAiMessage.id)
+    this.requestAIResponseStream(contextPrompt, testAiMessage.id)
       .then(() => {
         wx.hideLoading();
         wx.showToast({
