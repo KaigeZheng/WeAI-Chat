@@ -222,23 +222,29 @@
   gap: 6rpx;
   padding: 12rpx 16rpx;
   background: var(--bg-tertiary);
-  border: 1px solid var(--border-tertiary);
+  border: 2px solid var(--border-tertiary);
   border-radius: 20rpx;
   font-size: 24rpx;
   color: var(--text-secondary);
   transition: all 0.3s ease;
   cursor: pointer;
+  box-shadow: 0 2rpx 8rpx var(--shadow-primary);
 }
 
 .hobby-tag.active {
-  background: var(--accent-primary);
-  color: white;
-  border-color: var(--accent-primary);
-  box-shadow: 0 2rpx 8rpx var(--shadow-tertiary);
+  background: #667eea !important;
+  color: white !important;
+  border-color: #667eea !important;
+  box-shadow: 0 4rpx 12rpx rgba(102, 126, 234, 0.3) !important;
+  transform: scale(1.02);
 }
 
 .hobby-tag:active {
   transform: scale(0.95);
+}
+
+.hobby-tag.active:active {
+  transform: scale(0.97);
 }
 
 .hobby-icon {

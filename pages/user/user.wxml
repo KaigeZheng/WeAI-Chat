@@ -43,7 +43,7 @@
             <view 
               wx:for="{{hobbyOptions}}" 
               wx:key="key"
-              class="hobby-tag {{userInfo.hobbies.includes(item.key) ? 'active' : ''}}"
+              class="hobby-tag {{hobbySelected[index] ? 'active' : ''}}"
               data-hobby="{{item.key}}"
               bindtap="toggleHobby"
             >
