@@ -16,7 +16,53 @@ Page({
       userId: '' // 添加用户ID字段
     },
     isDarkMode: false, // 添加夜间模式状态
-    forceUpdate: 0
+    forceUpdate: 0,
+    // 对话风格选择器相关数据
+    currentStyle: 'general', // 当前选中的风格
+    showStyleMenu: false, // 是否显示风格选择菜单
+    styleConfigs: {
+      general: {
+        key: 'general',
+        name: '通用对话',
+        icon: '💬',
+        description: '自由对话，无特殊限制',
+        placeholder: '输入你的问题...',
+        systemPrompt: '你是一个有用的AI助手，请根据用户的问题提供准确、有帮助的回答。'
+      },
+      codeComment: {
+        key: 'codeComment',
+        name: '注释生成',
+        icon: '📝',
+        description: '为代码添加详细注释',
+        placeholder: '请上传需要添加注释的代码...',
+        systemPrompt: '你是一个专业的代码注释生成器。请为用户提供的代码添加详细、清晰的中文注释，包括函数说明、参数解释、返回值说明等。注释应该简洁明了，帮助理解代码逻辑。'
+      },
+      textGeneration: {
+        key: 'textGeneration',
+        name: '文本生成',
+        icon: '✍️',
+        description: '根据内容生成说明文档',
+        placeholder: '请提供需要生成说明的内容...',
+        systemPrompt: '你是一个专业的文档生成器。请根据用户提供的内容（代码、文本等）生成详细、结构化的说明文档。文档应该包含概述、详细说明、使用示例等部分，使用中文编写。'
+      },
+      translation: {
+        key: 'translation',
+        name: '翻译模式',
+        icon: '🌐',
+        description: '自动翻译为英文',
+        placeholder: '输入需要翻译的内容...',
+        systemPrompt: '你是一个专业的翻译助手。请将用户输入的中文内容翻译成英文。如果用户指定了其他目标语言，请翻译为指定语言。翻译应该准确、自然，保持原文的意思和语气。'
+      },
+      search: {
+        key: 'search',
+        name: '搜索模式',
+        icon: '🔍',
+        description: '言简意赅的搜索回答',
+        placeholder: '输入你的搜索问题...',
+        systemPrompt: '你是一个高效的搜索助手。请针对用户的问题提供言简意赅、直接有效的回答。回答应该简洁明了，突出重点，避免冗长的解释。'
+      }
+    },
+    canSend: false,
   },
 
   onLoad: function (options) {
@@ -31,6 +77,9 @@ Page({
     
     // 加载用户设置
     this.loadUserSettings();
+    
+    // 加载风格设置
+    this.loadStyleSettings();
     
     // 检查API Key是否已配置
     this.checkAPIKey();
@@ -186,8 +235,10 @@ Page({
 
   // 输入框内容变化
   onInputChange(e) {
+    const value = e.detail.value;
     this.setData({
-      inputMessage: e.detail.value
+      inputMessage: value,
+      canSend: value.trim().length > 0
     });
   },
 
@@ -278,9 +329,13 @@ Page({
     // 检查是否启用上下文功能
     const enableContext = wx.getStorageSync('enable_context') !== false; // 默认开启
     
+    // 获取当前风格的系统提示词
+    const currentStyleConfig = this.data.styleConfigs[this.data.currentStyle];
+    const systemPrompt = currentStyleConfig.systemPrompt;
+    
     if (!enableContext) {
       // 如果不启用上下文，只发送当前消息
-      let simplePrompt = 'system: 你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。\n\n';
+      let simplePrompt = `system: ${systemPrompt}\n\n`;
       simplePrompt += `user: ${currentMessage}\n\n`;
       simplePrompt += 'ai: ';
       return simplePrompt;
@@ -295,8 +350,8 @@ Page({
     // 构建完整的对话上下文
     let contextPrompt = '';
     
-    // 添加系统提示词
-    contextPrompt += 'system: 你的名字是WeAI Chat，是一个有用的AI助手，请用简洁明了的方式回答用户的问题。\n\n';
+    // 添加系统提示词（使用当前风格的系统提示词）
+    contextPrompt += `system: ${systemPrompt}\n\n`;
     
     // 添加历史对话记录
     recentMessages.forEach(msg => {
@@ -642,63 +697,62 @@ Page({
   // 测试wemark组件
   testWemark() {
     const testMessage = {
-      id: ++this.data.messageId,
-      role: 'user',
-      content: '请测试markdown渲染功能',
-      time: this.formatTime(new Date()),
-      userId: this.data.userInfo.userId
-    };
-
-    const testAiMessage = {
-      id: ++this.data.messageId,
+      id: this.data.messageId++,
       role: 'assistant',
-      content: `# Markdown 测试
-
-这是一个 **markdown** 渲染测试。
-
-## 代码示例
-
-\`\`\`javascript
-function hello() {
-  console.log("Hello, World!");
-}
-\`\`\`
-
-## 列表
-
-- 项目 1
-- 项目 2
-- 项目 3
-
-## 引用
-
-> 这是一个引用示例
-
-## 链接
-
-[点击这里](https://example.com)
-
-## 表格
-
-| 列1 | 列2 | 列3 |
-|-----|-----|-----|
-| 数据1 | 数据2 | 数据3 |
-| 数据4 | 数据5 | 数据6 |
-
-## 行内代码
-
-这里有一些 \`行内代码\` 示例。`,
+      content: '# 测试Markdown\n\n这是一个**粗体**文本，这是*斜体*文本。\n\n## 代码示例\n\n```javascript\nfunction hello() {\n  console.log("Hello World!");\n}\n```\n\n## 列表\n\n- 项目1\n- 项目2\n- 项目3\n\n## 表格\n\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 数据1 | 数据2 | 数据3 |\n| 数据4 | 数据5 | 数据6 |',
       time: this.formatTime(new Date()),
       model: this.data.currentService,
-      isStreaming: false,
       modelId: this.data.currentService
     };
-
+    
     this.setData({
-      messages: [...this.data.messages, testMessage, testAiMessage],
-      scrollToMessage: `msg-${testAiMessage.id}`
+      messages: [...this.data.messages, testMessage]
     });
-
+    
     this.saveMessages();
+    this.scrollToBottom();
   },
+
+  // 风格选择器相关方法
+  
+  // 切换风格选择菜单
+  toggleStyleMenu() {
+    this.setData({
+      showStyleMenu: !this.data.showStyleMenu
+    });
+  },
+
+  // 选择对话风格
+  selectStyle(e) {
+    const styleKey = e.currentTarget.dataset.style;
+    this.setData({
+      currentStyle: styleKey,
+      showStyleMenu: false
+    });
+    
+    // 保存用户选择的风格到本地存储
+    wx.setStorageSync('selected_style', styleKey);
+  },
+
+  // 点击外部关闭风格选择菜单
+  onPageTap() {
+    if (this.data.showStyleMenu) {
+      this.setData({
+        showStyleMenu: false
+      });
+    }
+  },
+
+  // 防止风格选择器点击事件冒泡
+  onStyleSelectorTap() {
+    // 空方法，用于阻止事件冒泡
+  },
+
+  // 加载用户保存的风格设置
+  loadStyleSettings() {
+    const savedStyle = wx.getStorageSync('selected_style') || 'general';
+    this.setData({
+      currentStyle: savedStyle
+    });
+  }
 });
