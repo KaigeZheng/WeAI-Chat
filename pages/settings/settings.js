@@ -156,9 +156,12 @@ Page({
     // 立即保存服务选择
     wx.setStorageSync('default_service', index);
     
-    wx.showToast({
-      title: `已切换到${this.data.serviceOptions[index]}`,
-      icon: 'success'
+    // 使用Modal显示完整的提示信息，避免Toast字符限制
+    wx.showModal({
+      title: '服务切换成功',
+      content: `已切换到${this.data.serviceOptions[index]}`,
+      showCancel: false,
+      confirmText: '确定'
     });
   },
 
