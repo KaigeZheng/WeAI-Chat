@@ -483,6 +483,28 @@
   border: none;
 }
 
+/* GitHub仓库按钮样式 */
+.github-btn {
+  background: rgba(0, 0, 0, 0.1);
+  color: #333333;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 12rpx;
+  padding: 12rpx 24rpx;
+  font-size: 24rpx;
+  min-width: 80rpx;
+}
+
+/* 夜间模式下的GitHub按钮样式 */
+.theme-dark .github-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.github-btn::after {
+  border: none;
+}
+
 /* 底部间距 */
 .bottom-spacer {
   height: 100rpx;

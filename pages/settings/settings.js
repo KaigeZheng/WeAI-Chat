@@ -370,6 +370,37 @@ SOFTWARE.`;
     });
   },
 
+  // 打开GitHub仓库
+  openGitHub() {
+    wx.showModal({
+      title: '访问GitHub仓库',
+      content: '由于微信小程序限制，无法直接跳转到外部链接。将为您复制GitHub仓库链接到剪贴板。',
+      success: (res) => {
+        if (res.confirm) {
+          // 复制GitHub仓库链接到剪贴板
+          wx.setClipboardData({
+            data: 'https://github.com/KaigeZheng/WeAI-Chat',
+            success: () => {
+              wx.showModal({
+                title: '链接已复制',
+                content: 'GitHub仓库链接已复制到剪贴板！\n\n请在浏览器中粘贴访问，或直接搜索"WeAI-Chat"项目。',
+                showCancel: false,
+                confirmText: '知道了'
+              });
+            },
+            fail: (err) => {
+              console.error('复制链接失败:', err);
+              wx.showToast({
+                title: '复制失败',
+                icon: 'none'
+              });
+            }
+          });
+        }
+      }
+    });
+  },
+
   // 保存设置
   saveSettings() {
     // 保存API Keys

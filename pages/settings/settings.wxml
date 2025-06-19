@@ -254,6 +254,17 @@
             <button class="license-btn" bindtap="showLicense">查看协议</button>
           </view>
         </view>
+
+        <!-- GitHub仓库 -->
+        <view class="setting-item">
+          <view class="setting-label">
+            <text class="label-text">GitHub仓库</text>
+            <text class="label-desc">查看项目源码和最新更新</text>
+          </view>
+          <view class="setting-button">
+            <button class="github-btn" bindtap="openGitHub">访问仓库</button>
+          </view>
+        </view>
       </view>
 
       <!-- 保存按钮 -->
