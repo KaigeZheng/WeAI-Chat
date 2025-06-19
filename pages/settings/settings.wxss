@@ -465,7 +465,7 @@
   font-weight: 600;
   text-align: center; 
   width: fit-content; 
-  min-width: 70rpx;
+  min-width: 70rpx; /* 刚好适应"1.4.3"的最小宽度 */
 }
 
 /* 开源协议按钮样式 */

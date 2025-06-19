@@ -288,8 +288,11 @@ const callStandardAPI = async (messages, config, service) => {
 // 调用阿里百炼API（流式）
 const callDashScopeAPIStream = async (messages, config, service, onChunk) => {
   try {
-    return new Promise((resolve, reject) => {
-      const requestTask = wx.request({
+    console.log('阿里百炼不支持真正的流式输出，使用非流式API + 模拟流式');
+    
+    // 直接调用非流式API
+    const response = await new Promise((resolve, reject) => {
+      wx.request({
         url: `${config.baseURL}/services/aigc/text-generation/generation`,
         method: 'POST',
         header: {
@@ -304,25 +307,29 @@ const callDashScopeAPIStream = async (messages, config, service, onChunk) => {
           parameters: {
             max_tokens: config.maxTokens,
             temperature: config.temperature,
-            result_format: 'message',
-            incremental_output: true // 启用增量输出
+            result_format: 'message'
           }
         },
         success: (res) => {
-          console.log(`${service}流式API响应成功:`, {
+          console.log(`${service}非流式API响应成功:`, {
             statusCode: res.statusCode,
             data: res.data
           });
           
           if (res.statusCode === 200) {
-            // 处理流式响应
-            processStreamResponse(res.data, onChunk, resolve, service);
+            const content = extractContent(res.data, service);
+            if (content) {
+              // 使用模拟流式输出
+              simulateStreamOutput(content, onChunk, resolve);
+            } else {
+              reject(new Error('无法提取API响应内容'));
+            }
           } else {
             reject(new Error(`${service} API调用失败: ${res.statusCode} - ${res.data?.message || '未知错误'}`));
           }
         },
         fail: (err) => {
-          console.error(`${service}流式API调用失败:`, {
+          console.error(`${service} API调用失败:`, {
             errMsg: err.errMsg,
             statusCode: err.statusCode,
             data: err.data
@@ -331,6 +338,8 @@ const callDashScopeAPIStream = async (messages, config, service, onChunk) => {
         }
       });
     });
+    
+    return response;
   } catch (error) {
     console.error(`${service}流式API调用异常:`, error);
     throw error;
@@ -386,6 +395,8 @@ const callStandardAPIStream = async (messages, config, service, onChunk) => {
 
 // 提取响应内容
 const extractContent = (data, service) => {
+  console.log('extractContent 输入数据:', JSON.stringify(data, null, 2));
+  
   // 如果是流式响应，先分割处理
   if (typeof data === 'string' && data.includes('data: ')) {
     const chunks = data.split('\n\n').filter(chunk => chunk.trim() && chunk !== 'data: [DONE]');
@@ -410,24 +421,43 @@ const extractContent = (data, service) => {
     return fullContent;
   }
   
-  // 非流式响应处理逻辑
+  // 阿里百炼响应格式处理
   if (data.output) {
+    console.log('检测到阿里百炼响应格式');
     if (data.output.text) {
+      console.log('提取到 text:', data.output.text);
       return data.output.text;
     } else if (data.output.choices && data.output.choices[0] && data.output.choices[0].message) {
+      console.log('提取到 message.content:', data.output.choices[0].message.content);
       return data.output.choices[0].message.content;
     } else if (data.output.message && data.output.message.content) {
+      console.log('提取到 output.message.content:', data.output.message.content);
       return data.output.message.content;
+    } else if (data.output.choices && data.output.choices[0] && data.output.choices[0].delta && data.output.choices[0].delta.content) {
+      console.log('提取到 delta.content:', data.output.choices[0].delta.content);
+      return data.output.choices[0].delta.content;
     }
   }
   
+  // OpenAI格式处理
   if (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) {
+    console.log('提取到 OpenAI message.content:', data.choices[0].message.content);
     return data.choices[0].message.content;
   }
   
-  if (data.text) return data.text;
-  if (data.content) return data.content;
-  if (data.message) return data.message;
+  // 其他可能的格式
+  if (data.text) {
+    console.log('提取到 text:', data.text);
+    return data.text;
+  }
+  if (data.content) {
+    console.log('提取到 content:', data.content);
+    return data.content;
+  }
+  if (data.message) {
+    console.log('提取到 message:', data.message);
+    return data.message;
+  }
   
   console.log('未识别的响应格式:', JSON.stringify(data, null, 2));
   return '';
@@ -469,6 +499,24 @@ const processStreamResponse = (data, onChunk, resolve, service) => {
   } else if (data.choices && data.choices[0] && data.choices[0].finish_reason) {
     console.log('流式输出完成，总内容:', fullContent);
     resolve(fullContent);
+  } else if (data.output && data.output.choices && data.output.choices[0] && data.output.choices[0].message) {
+    // 阿里百炼完整响应格式（非增量）
+    const message = data.output.choices[0].message;
+    if (message.content) {
+      console.log('检测到阿里百炼完整响应，使用模拟流式输出');
+      simulateStreamOutput(message.content, onChunk, resolve);
+      return;
+    }
+  }
+  
+  // 如果都没有匹配到，尝试直接提取内容
+  const content = extractContent(data, service);
+  if (content) {
+    console.log('使用extractContent提取内容，使用模拟流式输出');
+    simulateStreamOutput(content, onChunk, resolve);
+  } else {
+    console.log('无法提取内容，返回空字符串');
+    resolve('');
   }
 };
 
