@@ -273,32 +273,57 @@ Page({
 
   // 测试网络连接
   testNetwork() {
+    const serviceOptions = ['qwen', 'deepseek'];
+    const currentService = serviceOptions[this.data.defaultServiceIndex];
+    const serviceNames = ['Qwen-Plus', 'DeepSeek'];
+    const currentServiceName = serviceNames[this.data.defaultServiceIndex];
+    
+    // 根据当前选择的服务获取对应的API Key
+    let apiKey;
+    let testUrl;
+    
+    if (currentService === 'qwen') {
+      apiKey = this.data.dashScopeKey;
+      testUrl = 'https://dashscope.aliyuncs.com/api/v1/models';
+    } else if (currentService === 'deepseek') {
+      apiKey = this.data.deepseekKey;
+      testUrl = 'https://api.deepseek.com/v1/models';
+    }
+    
+    if (!apiKey) {
+      wx.showToast({
+        title: `请先配置${currentServiceName}的API Key`,
+        icon: 'none'
+      });
+      return;
+    }
+
     wx.showLoading({
-      title: '测试网络连接...'
+      title: `测试${currentServiceName}网络连接...`
     });
 
-    // 测试基本网络连接
+    // 测试对应服务的网络连接
     wx.request({
-      url: 'https://dashscope.aliyuncs.com/api/v1/models',
+      url: testUrl,
       method: 'GET',
       header: {
-        'Authorization': `Bearer ${this.data.dashScopeKey}`
+        'Authorization': `Bearer ${apiKey}`
       },
       success: (res) => {
         wx.hideLoading();
-        console.log('网络测试成功:', res);
+        console.log(`${currentServiceName}网络测试成功:`, res);
         wx.showModal({
           title: '网络连接正常',
-          content: `状态码: ${res.statusCode}\n可以访问阿里百炼API`,
+          content: `状态码: ${res.statusCode}\n可以访问${currentServiceName} API`,
           showCancel: false
         });
       },
       fail: (err) => {
         wx.hideLoading();
-        console.error('网络测试失败:', err);
+        console.error(`${currentServiceName}网络测试失败:`, err);
         wx.showModal({
           title: '网络连接失败',
-          content: `错误: ${err.errMsg}\n\n可能原因:\n1. 域名未添加到合法域名列表\n2. 网络连接问题\n3. API服务不可用`,
+          content: `错误: ${err.errMsg}\n\n可能原因:\n1. 域名未添加到合法域名列表\n2. 网络连接问题\n3. ${currentServiceName} API服务不可用`,
           showCancel: false
         });
       }

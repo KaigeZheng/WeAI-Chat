@@ -2,7 +2,7 @@
 const API_CONFIG = {
   // 阿里百炼 Qwen-Plus配置
   qwen: {
-    apiKey: 'sk-8c6a8858950b49d4b3d1077ff5f12880',
+    apiKey: 'sk-6f34798d50eb455c805adf7268b1851b',
     baseURL: 'https://dashscope.aliyuncs.com/api/v1',
     model: 'qwen-plus',
     maxTokens: 1000,
