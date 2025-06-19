@@ -234,7 +234,14 @@ Page({
   testAPI() {
     const serviceOptions = ['qwen', 'deepseek'];
     const currentService = serviceOptions[this.data.defaultServiceIndex];
-    const apiKey = getAPIKey(currentService);
+    
+    // 根据当前选择的服务获取对应的API Key
+    let apiKey;
+    if (currentService === 'qwen') {
+      apiKey = this.data.dashScopeKey;
+    } else if (currentService === 'deepseek') {
+      apiKey = this.data.deepseekKey;
+    }
     
     if (!apiKey) {
       wx.showToast({
@@ -244,9 +251,11 @@ Page({
       return;
     }
 
+    // 先保存API Key到配置中
+    setAPIKey(currentService, apiKey);
+
     console.log(`开始测试${currentService} API连接`);
     console.log(`API Key: ${apiKey.substring(0, 10)}...`);
-    console.log(`服务配置:`, API_CONFIG[currentService]);
 
     wx.showLoading({
       title: '测试API连接...'

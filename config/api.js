@@ -131,6 +131,16 @@ const parsePromptToMessages = (prompt) => {
   const messages = [];
   const lines = prompt.split('\n');
   
+  // 如果prompt是简单文本（不包含role前缀），直接作为user消息处理
+  if (lines.length === 1 && !prompt.includes(':')) {
+    messages.push({
+      role: 'user',
+      content: prompt.trim()
+    });
+    console.log('解析后的消息数组:', messages);
+    return messages;
+  }
+  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
@@ -159,6 +169,14 @@ const parsePromptToMessages = (prompt) => {
         });
       }
     }
+  }
+  
+  // 确保至少有一条user消息
+  if (messages.length === 0) {
+    messages.push({
+      role: 'user',
+      content: prompt.trim()
+    });
   }
   
   console.log('解析后的消息数组:', messages);
