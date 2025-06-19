@@ -97,9 +97,9 @@ page {
 
 /* 安全区域适配 */
 .safe-area-top {
-  height: calc(env(safe-area-inset-top) + 60rpx);
+  height: calc(env(safe-area-inset-top) + 80rpx);
   background: var(--bg-gradient);
-  min-height: 80rpx;
+  min-height: 100rpx;
 }
 
 .safe-area-bottom {
@@ -112,7 +112,7 @@ page {
   background: var(--bg-secondary);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid var(--border-primary);
-  padding: 20rpx 0;
+  padding: 30rpx 0 20rpx 0;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -122,8 +122,9 @@ page {
 .header-content {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 0 30rpx;
+  margin-top: 20rpx;
 }
 
 .title-section {
@@ -131,6 +132,8 @@ page {
   flex-direction: column;
   align-items: flex-start;
   gap: 8rpx;
+  margin-top: 0;
+  justify-content: flex-start;
 }
 
 .title {
@@ -138,6 +141,8 @@ page {
   font-weight: 700;
   color: var(--text-primary);
   letter-spacing: -0.5rpx;
+  margin-top: -10rpx;
+  line-height: 1;
 }
 
 .service-indicator {
@@ -147,16 +152,19 @@ page {
   padding: 4rpx 12rpx;
   border-radius: 12rpx;
   border: 1px solid rgba(102, 126, 234, 0.2);
+  margin-top: 4rpx;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16rpx;
+  gap: 20rpx;
+  margin-top: 15rpx;
+  padding-right: 20rpx;
 }
 
 .rect-btn {
-  padding: 12rpx 20rpx;
+  padding: 14rpx 24rpx;
   border-radius: 16rpx;
   display: flex;
   align-items: center;
@@ -165,6 +173,7 @@ page {
   position: relative;
   overflow: hidden;
   min-width: 80rpx;
+  margin-top: 5rpx;
 }
 
 .rect-btn::before {
@@ -889,6 +898,7 @@ page {
   transition: all 0.3s ease;
   box-shadow: 0 2rpx 8rpx var(--shadow-primary);
   border: 2rpx solid var(--border-primary);
+  margin-top: 8rpx;
 }
 
 .user-avatar:active {

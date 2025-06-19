@@ -12,7 +12,7 @@ Page({
     showDeepSeekKey: false,
     temperature: 0.7,
     maxTokens: 1024,
-    appVersion: '1.4.2',
+    appVersion: '1.4.4',
     isDarkMode: false,
     pageTheme: 'light',
     themeClass: 'theme-light',
@@ -47,7 +47,7 @@ Page({
     const maxTokens = wx.getStorageSync('maxTokens') || 1024;
     
     // 加载版本号
-    const appVersion = wx.getStorageSync('app_version') || '1.4.2';
+    const appVersion = wx.getStorageSync('app_version') || '1.4.4';
     
     // 加载夜间模式设置
     const app = getApp();
