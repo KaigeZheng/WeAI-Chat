@@ -6,7 +6,7 @@ App({
 
   onLaunch() {
     // 初始化应用版本号
-    const currentVersion = '1.4.1';
+    const currentVersion = '1.4.2';
     const storedVersion = wx.getStorageSync('app_version');
     
     if (!storedVersion) {

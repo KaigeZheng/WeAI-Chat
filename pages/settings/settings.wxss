@@ -460,12 +460,12 @@
   color: var(--accent-primary);
   border: 1px solid rgba(102, 126, 234, 0.2);
   border-radius: 12rpx;
-  padding: 12rpx 16rpx; /* 与license-btn保持相同的高度padding */
+  padding: 12rpx 16rpx;
   font-size: 24rpx;
   font-weight: 600;
-  text-align: center; /* 改为居中对齐，看起来更整齐 */
-  width: fit-content; /* 宽度适应内容 */
-  min-width: 70rpx; /* 刚好适应"1.4.1"的最小宽度 */
+  text-align: center; 
+  width: fit-content; 
+  min-width: 70rpx;
 }
 
 /* 开源协议按钮样式 */
