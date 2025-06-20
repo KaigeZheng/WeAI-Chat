@@ -1,6 +1,6 @@
 // index.js
 const { callAIAPI, callAIAPIStream, setAPIKey, getAPIKey, API_CONFIG } = require('../../config/api.js');
-
+const towxml = require('../../towxml/index.js');
 Page({
   data: {
     messages: [],
@@ -201,26 +201,25 @@ Page({
   // 加载历史消息
   loadMessages() {
     const messages = wx.getStorageSync('chat_messages') || [];
-    
-    // 为历史消息添加默认模型信息（兼容旧版本）
     const processedMessages = messages.map(msg => {
       let processedMsg = { ...msg };
-      
+      if (msg.role === 'assistant' && msg.content) {
+        try {
+          processedMsg.towxmlNodes = towxml(msg.content, 'markdown');
+        } catch (e) {
+          processedMsg.towxmlNodes = {};
+        }
+      }
+      // 其它兼容逻辑...
       if (msg.role === 'assistant' && !msg.model) {
-        // 对于没有model字段的旧AI消息，默认设置为qwen
         processedMsg.model = 'qwen';
       }
-      
       if (msg.role === 'user' && !msg.userId) {
-        // 对于没有userId字段的旧用户消息，使用当前用户ID
         processedMsg.userId = this.data.userInfo.userId || this.generateUserId();
       }
-      
       if (msg.role === 'assistant' && !msg.modelId) {
-        // 对于没有modelId字段的旧AI消息，使用model字段
         processedMsg.modelId = msg.model || 'qwen';
       }
-      
       return processedMsg;
     });
     
@@ -626,7 +625,8 @@ Page({
               // 只更新指定消息的内容，保持其他属性不变
               const updatedMessage = {
                 ...messages[messageIndex],
-                content: fullContent
+                content: fullContent,
+                towxmlNodes: towxml(fullContent, 'markdown')
               };
               messages[messageIndex] = updatedMessage;
               
@@ -653,6 +653,7 @@ Page({
           return { 
             ...msg, 
             content: fullContent,
+            towxmlNodes: towxml(fullContent, 'markdown'),
             isStreaming: false 
           };
         }
@@ -684,6 +685,7 @@ Page({
             return { 
               ...msg, 
               content: response,
+              towxmlNodes: towxml(response, 'markdown'),
               isStreaming: false
             };
           }
@@ -706,6 +708,7 @@ Page({
             return { 
               ...msg, 
               content: `抱歉，我遇到了一些问题：${fallbackError.message || '请检查网络连接和API配置'}`,
+              towxmlNodes: towxml(`抱歉，我遇到了一些问题：${fallbackError.message || '请检查网络连接和API配置'}`,'markdown'),
               isStreaming: false
             };
           }
@@ -790,25 +793,6 @@ Page({
     wx.navigateTo({
       url: '/pages/settings/settings'
     });
-  },
-
-  // 测试wemark组件
-  testWemark() {
-    const testMessage = {
-      id: this.data.messageId++,
-      role: 'assistant',
-      content: '# 测试Markdown\n\n这是一个**粗体**文本，这是*斜体*文本。\n\n## 代码示例\n\n```javascript\nfunction hello() {\n  console.log("Hello World!");\n}\n```\n\n## 列表\n\n- 项目1\n- 项目2\n- 项目3\n\n## 表格\n\n| 列1 | 列2 | 列3 |\n|-----|-----|-----|\n| 数据1 | 数据2 | 数据3 |\n| 数据4 | 数据5 | 数据6 |',
-      time: this.formatTime(new Date()),
-      model: this.data.currentService,
-      modelId: this.data.currentService
-    };
-
-    this.setData({
-      messages: [...this.data.messages, testMessage]
-    });
-
-    this.saveMessages();
-    this.scrollToBottom();
   },
 
   // 风格选择器相关方法

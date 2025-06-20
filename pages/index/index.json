@@ -2,6 +2,6 @@
   "navigationBarTitleText": "WeAI Chat",
   "navigationStyle": "custom",
   "usingComponents": {
-    "wemark": "../../components/wemark/wemark/wemark"
+    "towxml": "/towxml/towxml"
   }
 }
