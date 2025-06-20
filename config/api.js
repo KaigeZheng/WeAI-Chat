@@ -114,10 +114,18 @@ const makeAPIRequestStream = async (prompt, config, service, onChunk) => {
     // 解析prompt中的对话历史
     const messages = parsePromptToMessages(prompt);
 
-    // 根据服务类型使用不同的API格式
+    // qwen 依然用模拟流式，deepseek 也用非流式API（不走流式）
     if (service === 'qwen') {
       return await callDashScopeAPIStream(messages, config, service, onChunk);
+    } else if (service === 'deepseek') {
+      // deepseek 只用非流式API
+      const content = await callStandardAPI(messages, config, service);
+      // 用模拟流式输出
+      return await new Promise((resolve) => {
+        simulateStreamOutput(content, onChunk, resolve);
+      });
     } else {
+      // 其他服务保持原样
       return await callStandardAPIStream(messages, config, service, onChunk);
     }
   } catch (error) {

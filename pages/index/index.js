@@ -156,10 +156,8 @@ Page({
     const defaultService = wx.getStorageSync('default_service') || 0;
     const serviceOptions = ['qwen', 'deepseek'];
     const currentService = serviceOptions[defaultService];
-    
     this.setData({ currentService });
-    
-    // 更新API配置中的默认服务
+    // 强制同步API_CONFIG.defaultService，防止遗漏
     API_CONFIG.defaultService = currentService;
   },
 
