@@ -2,7 +2,7 @@
 
 一个基于微信小程序的AI对话应用，支持多种AI模型，提供智能对话服务。
 
-![WeAI Chat](imgs/icon.jpg)
+![WeAI Chat](imgs/icon.png)
 
 ## Software Features
 
