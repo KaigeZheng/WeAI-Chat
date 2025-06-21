@@ -8,8 +8,6 @@
   </a>
 </div>
 
-![WeAI Chat](imgs/icon.png)
-
 ## Software Features
 
 - ✨ **简洁美观的UI设计** - 采用现代化渐变背景和GUI
