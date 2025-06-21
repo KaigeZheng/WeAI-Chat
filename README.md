@@ -2,6 +2,12 @@
 
 一个基于微信小程序的AI对话应用，支持多种AI模型，提供智能对话服务。
 
+<div align="center">
+  <a href="https://github.com/KaigeZheng/WeAI-Chat">
+    <img alt="WeAI Chat" height="200px" src="https://github.com/KaigeZheng/WeAI-Chat/blob/main/imgs/icon.png">
+  </a>
+</div>
+
 ![WeAI Chat](imgs/icon.png)
 
 ## Software Features
